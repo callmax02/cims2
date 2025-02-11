@@ -4,12 +4,14 @@ import com.example.backend.model.Item;
 import com.example.backend.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
+@CrossOrigin(origins = "http://localhost:5173") // Allow only your React frontend
 public class ItemController {
 
     private final ItemService itemService;
