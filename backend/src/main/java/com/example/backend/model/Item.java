@@ -21,11 +21,11 @@ public class Item {
     private String department;
 
     @NotBlank(message = "Asset Tag is required")
-    @Column(unique = true)
+    // @Column(unique = true)
     private String assetTag;
 
     @NotBlank(message = "Serial is required")
-    @Column(unique = true)
+    // @Column(unique = true)
     private String serial;
 
     @NotBlank(message = "Model is required")
