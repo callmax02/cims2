@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddItemForm = ({ onAdd }) => {
   const [formData, setFormData] = useState({
@@ -8,10 +11,11 @@ const AddItemForm = ({ onAdd }) => {
     model: "",
     status: "",
     defaultLocation: "",
-    image: "",
+    image: "", // Stores Base64-encoded image
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,28 +25,50 @@ const AddItemForm = ({ onAdd }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
-      setImagePreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1]; // Remove prefix
+        setFormData((prev) => ({ ...prev, image: base64String }));
+        setImagePreview(reader.result); // Keep full Base64 for preview
+      };
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        toast.error("Failed to load image");
+      };
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAdd({ id: Date.now(), ...formData }); // Pass data to parent component
-    setFormData({
-      department: "",
-      assetTag: "",
-      serial: "",
-      model: "",
-      status: "",
-      defaultLocation: "",
-      image: "",
-    });
-    setImagePreview(null);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/items", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add item");
+      }
+
+      toast.success("Item inserted!");
+
+      setTimeout(() => {
+        window.location.href = "/dashboard"; // Redirect after 2 seconds
+      }, 2000);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <ToastContainer />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"
@@ -50,7 +76,9 @@ const AddItemForm = ({ onAdd }) => {
         <h2 className="text-xl font-semibold mb-4 text-center">Add New Item</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium">Department</label>
+          <label className="block text-sm font-medium">
+            <span className="text-red-500">*</span> Department
+          </label>
           <input
             type="text"
             name="department"
@@ -63,7 +91,9 @@ const AddItemForm = ({ onAdd }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
-            <label className="block text-sm font-medium">Asset Tag</label>
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Asset Tag
+            </label>
             <input
               type="text"
               name="assetTag"
@@ -75,7 +105,9 @@ const AddItemForm = ({ onAdd }) => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">Serial</label>
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Serial
+            </label>
             <input
               type="text"
               name="serial"
@@ -89,7 +121,9 @@ const AddItemForm = ({ onAdd }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
-            <label className="block text-sm font-medium">Model</label>
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Model
+            </label>
             <input
               type="text"
               name="model"
@@ -101,7 +135,9 @@ const AddItemForm = ({ onAdd }) => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium">Status</label>
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Status
+            </label>
             <input
               type="text"
               name="status"
@@ -114,7 +150,9 @@ const AddItemForm = ({ onAdd }) => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium">Default Location</label>
+          <label className="block text-sm font-medium">
+            <span className="text-red-500">*</span> Default Location
+          </label>
           <input
             type="text"
             name="defaultLocation"
