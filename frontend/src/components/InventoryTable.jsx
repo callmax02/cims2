@@ -138,7 +138,7 @@ const InventoryTable = () => {
                       <button
                         className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
                         onClick={() => {
-                          navigate(`/editItem?id=${item.id}`);
+                          navigate(`/editItem/${item.id}`);
                         }}
                       >
                         <FaEdit />
@@ -164,7 +164,7 @@ const InventoryTable = () => {
                       <button
                         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
                         onClick={() => {
-                          navigate(`/saveQR?id=${item.id}`);
+                          navigate(`/saveQR/${item.id}`);
                         }}
                       >
                         <FaQrcode />
