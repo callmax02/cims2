@@ -28,7 +28,9 @@ const InventoryTable = () => {
 
         setItems(itemsWithImages);
       } catch (error) {
-        toast.error(error.message);
+        navigate("/dashboard", {
+          state: { message: error.message, type: "error" },
+        });
       } finally {
         setLoading(false);
       }
