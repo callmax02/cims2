@@ -19,7 +19,7 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <ToastContainer pauseOnFocusLoss={false} />
+      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <InventoryTable />
     </div>
   );

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const SaveQR = () => {
+  const navigate = useNavigate();
+
   const { id } = useParams();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,11 @@ const SaveQR = () => {
     link.click();
     document.body.removeChild(link);
 
-    toast.success("QR Code saved successfully!");
+    toast.success("QR Code saved successfully!", {
+      onClose: () => {
+        navigate("/dashboard");
+      },
+    });
   };
 
   if (loading)
@@ -59,7 +65,7 @@ const SaveQR = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <ToastContainer pauseOnFocusLoss={false} />
+      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center w-80">
         <h2 className="text-lg font-semibold mb-4">QR for Item: {item?.id}</h2>
         <img
