@@ -1,20 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const EditItemForm = ({ onEdit }) => {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const EditItemForm = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    department: "IT Department",
-    assetTag: "AT-12345",
-    serial: "SN-987654",
-    model: "Dell Latitude 5400",
-    status: "Assigned",
-    defaultLocation: "HQ Office",
-    image: "",
+    department: "",
+    assetTag: "",
+    serial: "",
+    model: "",
+    status: "",
+    defaultLocation: "",
+    image: null,
   });
 
+  const [isDisabled, setIsDisabled] = useState(true);
   const [imagePreview, setImagePreview] = useState(
     "https://placehold.co/40x40"
   );
 
+  // Fetch item details
+  useEffect(() => {
+    const fetchItem = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch item details");
+        }
+        const data = await response.json();
+
+        setFormData({
+          department: data.department || "",
+          assetTag: data.assetTag || "",
+          serial: data.serial || "",
+          model: data.model || "",
+          status: data.status || "",
+          defaultLocation: data.defaultLocation || "",
+          image: data.image || "",
+        });
+
+        setIsDisabled(false);
+
+        if (data.image) {
+          setImagePreview(`data:image/jpeg;base64,${data.image}`);
+        }
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setIsDisabled(false);
+      }
+    };
+
+    fetchItem();
+  }, [id]);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -23,21 +67,53 @@ const EditItemForm = ({ onEdit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
-      setImagePreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1]; // Remove prefix
+        setFormData((prev) => ({ ...prev, image: base64String }));
+        setImagePreview(reader.result); // Keep full Base64 for preview
+      };
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        toast.error("Failed to load image");
+      };
     }
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submission (PUT request)
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onEdit(formData); // Pass updated data to parent component
+    setIsDisabled(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update item");
+      }
+
+      navigate("/dashboard", {
+        state: { message: "Item edited!", type: "success" },
+      });
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <ToastContainer pauseOnFocusLoss={false} />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"
+        encType="multipart/form-data"
       >
         <h2 className="text-xl font-semibold mb-4 text-center">Edit Item</h2>
 
@@ -50,6 +126,7 @@ const EditItemForm = ({ onEdit }) => {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
+            disabled={isDisabled}
           />
         </div>
 
@@ -63,6 +140,7 @@ const EditItemForm = ({ onEdit }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isDisabled}
             />
           </div>
 
@@ -75,6 +153,7 @@ const EditItemForm = ({ onEdit }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isDisabled}
             />
           </div>
         </div>
@@ -89,6 +168,7 @@ const EditItemForm = ({ onEdit }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isDisabled}
             />
           </div>
 
@@ -101,6 +181,7 @@ const EditItemForm = ({ onEdit }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isDisabled}
             />
           </div>
         </div>
@@ -114,6 +195,7 @@ const EditItemForm = ({ onEdit }) => {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
+            disabled={isDisabled}
           />
         </div>
 
@@ -124,6 +206,7 @@ const EditItemForm = ({ onEdit }) => {
             accept="image/*"
             onChange={handleImageChange}
             className="w-full border rounded p-2"
+            disabled={isDisabled}
           />
           {imagePreview && (
             <img
@@ -137,6 +220,7 @@ const EditItemForm = ({ onEdit }) => {
         <button
           type="submit"
           className="w-full bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
+          disabled={isDisabled}
         >
           Edit Item
         </button>
