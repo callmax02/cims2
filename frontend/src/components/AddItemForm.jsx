@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AddItemForm = ({ onAdd }) => {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const AddItemForm = () => {
   const [formData, setFormData] = useState({
     department: "",
     assetTag: "",
@@ -15,6 +17,7 @@ const AddItemForm = ({ onAdd }) => {
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -41,9 +44,10 @@ const AddItemForm = ({ onAdd }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/items", {
+      const response = await fetch(`${API_BASE_URL}/api/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,19 +60,19 @@ const AddItemForm = ({ onAdd }) => {
         throw new Error(errorData.message || "Failed to add item");
       }
 
-      toast.success("Item inserted!");
-
-      setTimeout(() => {
-        window.location.href = "/dashboard"; // Redirect after 2 seconds
-      }, 2000);
+      navigate("/dashboard", {
+        state: { message: "Item inserted!", type: "success" },
+      });
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <ToastContainer />
+      <ToastContainer pauseOnFocusLoss={false} />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"
@@ -86,6 +90,7 @@ const AddItemForm = ({ onAdd }) => {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -101,6 +106,7 @@ const AddItemForm = ({ onAdd }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -115,6 +121,7 @@ const AddItemForm = ({ onAdd }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -131,6 +138,7 @@ const AddItemForm = ({ onAdd }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -145,6 +153,7 @@ const AddItemForm = ({ onAdd }) => {
               onChange={handleChange}
               className="w-full border rounded p-2"
               required
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -160,6 +169,7 @@ const AddItemForm = ({ onAdd }) => {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -170,6 +180,7 @@ const AddItemForm = ({ onAdd }) => {
             accept="image/*"
             onChange={handleImageChange}
             className="w-full border rounded p-2"
+            disabled={isSubmitting}
           />
           {imagePreview && (
             <img
@@ -183,8 +194,9 @@ const AddItemForm = ({ onAdd }) => {
         <button
           type="submit"
           className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+          disabled={isSubmitting}
         >
-          Add Item
+          {isSubmitting ? "Adding..." : "Add Item"}
         </button>
       </form>
     </div>
