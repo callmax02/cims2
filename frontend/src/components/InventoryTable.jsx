@@ -1,41 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaQrcode, FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const InventoryTable = () => {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      department: "Software Development Team",
-      assetTag: "AS-5731",
-      serial: "20230715-001-123",
-      model: "Lenovo Yoga S730-13IML",
-      status: "Assigned",
-      defaultLocation: "IT Office",
-      image: "Placeholder image",
-    },
-    {
-      id: 2,
-      department: "Software Development Team",
-      assetTag: "AS-5731",
-      serial: "20230715-001-123",
-      model: "Lenovo Yoga S730-13IML",
-      status: "Assigned",
-      defaultLocation: "IT Office",
-      image: "Placeholder image",
-    },
-    {
-      id: 3,
-      department: "Software Development Team",
-      assetTag: "AS-5731",
-      serial: "20230715-001-123",
-      model: "Lenovo Yoga S730-13IML",
-      status: "Assigned",
-      defaultLocation: "IT Office",
-      image: "Placeholder image",
-    },
-  ]);
+  const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/items`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch items");
+        }
+        const data = await response.json();
+
+        // Convert Base64 strings to proper image URLs
+        const itemsWithImages = data.map((item) => ({
+          ...item,
+          imageUrl: item.image ? `data:image/jpeg;base64,${item.image}` : null,
+        }));
+
+        setItems(itemsWithImages);
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
 
   const openDeleteModal = (item) => {
     setSelectedItem(item);
@@ -47,9 +47,34 @@ const InventoryTable = () => {
     setSelectedItem(null);
   };
 
-  const confirmDelete = () => {
-    setItems(items.filter((item) => item.id !== selectedItem.id));
-    closeDeleteModal();
+  const confirmDelete = async () => {
+    if (!selectedItem) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/items/${selectedItem.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete item");
+      }
+
+      // Remove the deleted item from the state
+      setItems(items.filter((item) => item.id !== selectedItem.id));
+      navigate("/dashboard", {
+        state: { message: "Item deleted successfully!", type: "success" },
+      });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      navigate("/dashboard", {
+        state: { message: error.message, type: "error" },
+      });
+    } finally {
+      closeDeleteModal();
+    }
   };
 
   return (
@@ -57,7 +82,12 @@ const InventoryTable = () => {
       <div className="w-full max-w-6xl bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Inventory Items</h2>
-          <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center">
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
+            onClick={() => {
+              navigate("/addItem");
+            }}
+          >
             <FaPlus className="mr-2" /> Add Item
           </button>
         </div>
@@ -94,14 +124,23 @@ const InventoryTable = () => {
                   </td>
                   <td className="border border-gray-300 p-2">
                     <img
-                      src="https://placehold.co/40x40"
+                      src={
+                        item.imageUrl
+                          ? item.imageUrl
+                          : "https://placehold.co/40x40"
+                      }
                       alt="Asset"
                       className="w-10 h-10 rounded-md"
                     />
                   </td>
                   <td className="border border-gray-300 p-2 flex justify-center space-x-2">
                     <div className="relative group">
-                      <button className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center">
+                      <button
+                        className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
+                        onClick={() => {
+                          navigate(`/editItem?id=${item.id}`);
+                        }}
+                      >
                         <FaEdit />
                       </button>
                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -122,7 +161,12 @@ const InventoryTable = () => {
                     </div>
 
                     <div className="relative group">
-                      <button className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center">
+                      <button
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
+                        onClick={() => {
+                          navigate(`/saveQR?id=${item.id}`);
+                        }}
+                      >
                         <FaQrcode />
                       </button>
                       <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
