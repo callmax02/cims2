@@ -12,8 +12,8 @@ const App = () => {
         <Routes>
           <Route exact path="/dashboard" element={<DashboardPage />} />
           <Route exact path="/addItem" element={<AddItemPage />} />
-          <Route exact path="/editItem" element={<EditItemPage />} />
-          <Route exact path="/saveQR" element={<SaveQRPage />} />
+          <Route exact path="/editItem/:id" element={<EditItemPage />} />
+          <Route exact path="/saveQR/:id" element={<SaveQRPage />} />
         </Routes>
       </BrowserRouter>
     </>
