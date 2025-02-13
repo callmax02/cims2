@@ -16,12 +16,14 @@ const EditItemForm = () => {
     status: "",
     defaultLocation: "",
     image: null,
+    qrCode: null,
   });
 
   const [isDisabled, setIsDisabled] = useState(true);
   const [imagePreview, setImagePreview] = useState(
     "https://placehold.co/40x40"
   );
+  const [qrPreview, setQrPreview] = useState("https://placehold.co/40x40");
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Fetch item details
@@ -42,12 +44,17 @@ const EditItemForm = () => {
           status: data.status || "",
           defaultLocation: data.defaultLocation || "",
           image: data.image || "",
+          qrCode: data.qrCode || "",
         });
 
         setIsDisabled(false);
 
         if (data.image) {
           setImagePreview(`data:image/jpeg;base64,${data.image}`);
+        }
+
+        if (data.qrCode) {
+          setQrPreview(`data:image/jpeg;base64,${data.qrCode}`);
         }
       } catch (err) {
         toast.error(err.message);
@@ -203,22 +210,38 @@ const EditItemForm = () => {
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full border rounded p-2"
-            disabled={isDisabled}
-          />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mt-2 w-20 h-20 rounded shadow"
+        <div className="grid grid-cols-2 gap-4">
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full border rounded p-2"
+              disabled={isDisabled}
             />
-          )}
+            {imagePreview && (
+              <div className="flex justify-center mt-4">
+                <img
+                  src={imagePreview}
+                  alt="Image Preview"
+                  className="w-24 h-24 rounded shadow"
+                />
+              </div>
+            )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">QR Code</label>
+            {qrPreview && (
+              <div className="flex justify-center mt-5">
+                <img
+                  src={qrPreview}
+                  alt="QR Code Preview"
+                  className="w-40 h-40 rounded shadow object-cover"
+                />
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex justify-between">
           <button
@@ -226,7 +249,7 @@ const EditItemForm = () => {
             className="w-1/2 mr-2 bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
             disabled={isDisabled}
           >
-            Edit Item
+            Update
           </button>
           <button
             type="button"
