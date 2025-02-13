@@ -18,6 +18,7 @@ const AddItemForm = () => {
 
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -57,7 +58,7 @@ const AddItemForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to add item");
+        throw new Error(errorData.assetTag || "Failed to add item");
       }
 
       navigate("/dashboard", {
@@ -68,6 +69,19 @@ const AddItemForm = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancelClick = () => {
+    setShowCancelModal(true); // Show the confirmation modal
+  };
+
+  const handleConfirmCancel = () => {
+    setShowCancelModal(false);
+    navigate("/dashboard"); // Navigate if user confirms
+  };
+
+  const handleCloseModal = () => {
+    setShowCancelModal(false); // Close modal when user clicks "No"
   };
 
   return (
@@ -191,14 +205,50 @@ const AddItemForm = () => {
           )}
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Adding..." : "Add Item"}
-        </button>
+        <div className="flex justify-between">
+          <button
+            type="submit"
+            className="w-1/2 mr-2 bg-green-500 text-white p-2 rounded hover:bg-green-600"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Adding..." : "Add Item"}
+          </button>
+          <button
+            type="button"
+            onClick={handleCancelClick}
+            className="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+            <p className="text-lg font-semibold mb-4">Cancel Adding Item?</p>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to cancel?
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleConfirmCancel}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Yes
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
