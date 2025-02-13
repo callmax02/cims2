@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateAssetTagException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateAssetTagException(DuplicateAssetTagException ex) {
         Map<String, String> error = new HashMap<>();
-        error.put("assetTag", ex.getMessage());
+        error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

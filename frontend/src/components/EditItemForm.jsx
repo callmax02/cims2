@@ -22,6 +22,7 @@ const EditItemForm = () => {
   const [imagePreview, setImagePreview] = useState(
     "https://placehold.co/40x40"
   );
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Fetch item details
   useEffect(() => {
@@ -96,7 +97,8 @@ const EditItemForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update item");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update item");
       }
 
       navigate("/dashboard", {
@@ -104,6 +106,8 @@ const EditItemForm = () => {
       });
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setIsDisabled(false);
     }
   };
 
@@ -216,15 +220,45 @@ const EditItemForm = () => {
             />
           )}
         </div>
-
-        <button
-          type="submit"
-          className="w-full bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
-          disabled={isDisabled}
-        >
-          Edit Item
-        </button>
+        <div className="flex justify-between">
+          <button
+            type="submit"
+            className="w-1/2 mr-2 bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
+            disabled={isDisabled}
+          >
+            Edit Item
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCancelModal(true)}
+            className="w-1/2 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-md w-96">
+            <h3 className="text-lg font-semibold">Cancel Editing</h3>
+            <p className="mt-2">Are you sure you want to cancel editing?</p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

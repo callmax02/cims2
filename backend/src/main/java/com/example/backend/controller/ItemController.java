@@ -47,7 +47,7 @@ public class ItemController {
         } catch (DuplicateAssetTagException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("error", "Item not found"));
+            return ResponseEntity.status(500).body(Map.of("error", "The server encountered an error. Please try again later."));
         }
     }
 

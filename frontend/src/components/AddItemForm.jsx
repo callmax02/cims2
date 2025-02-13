@@ -58,7 +58,7 @@ const AddItemForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.assetTag || "Failed to add item");
+        throw new Error(errorData.error || "Failed to add item");
       }
 
       navigate("/dashboard", {
