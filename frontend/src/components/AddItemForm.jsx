@@ -211,7 +211,7 @@ const AddItemForm = () => {
             className="w-1/2 mr-2 bg-green-500 text-white p-2 rounded hover:bg-green-600"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Adding..." : "Add Item"}
+            {isSubmitting ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
