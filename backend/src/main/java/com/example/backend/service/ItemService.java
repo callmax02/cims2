@@ -44,7 +44,7 @@ public class ItemService {
         Item savedItem = itemRepository.save(item);
 
         // Generate QR code using the assigned ID
-        byte[] qrCode = generateQRCode(savedItem.getId().toString());
+        byte[] qrCode = generateQRCode(savedItem.getAssetTag().toString());
 
         // Update the saved item with the generated QR code
         savedItem.setQrCode(qrCode);
@@ -71,6 +71,12 @@ public class ItemService {
             existingItem.setStatus(itemDetails.getStatus());
             existingItem.setDefaultLocation(itemDetails.getDefaultLocation());
             existingItem.setImage(itemDetails.getImage());
+
+            // Generate QR code using the assigned ID
+            byte[] qrCode = generateQRCode(existingItem.getAssetTag().toString());
+
+            // Update the saved item with the generated QR code
+            existingItem.setQrCode(qrCode);
     
             return itemRepository.save(existingItem);
         }).orElseThrow(() -> new RuntimeException("Item not found"));
