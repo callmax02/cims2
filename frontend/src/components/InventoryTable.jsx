@@ -184,21 +184,25 @@ const InventoryTable = () => {
       </div>
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p>Are you sure you want to delete this item?</p>
-            <div className="flex justify-end mt-4 space-x-2">
-              <button
-                onClick={closeDeleteModal}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+            <h3 className="text-lg font-semibold mb-4">
+              Cancel Deleting Item?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this item?
+            </p>
+            <div className="flex justify-center space-x-4">
               <button
                 onClick={confirmDelete}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
                 Delete
+              </button>
+              <button
+                onClick={closeDeleteModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
               </button>
             </div>
           </div>
