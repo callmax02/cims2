@@ -8,6 +8,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import org.springframework.stereotype.Service;
+import com.example.backend.exception.DuplicateAssetTagException;
 
 import java.io.ByteArrayOutputStream;
 // import java.nio.file.FileSystems;
@@ -32,6 +33,12 @@ public class ItemService {
     }
 
     public Item createItem(Item item) {
+
+        // Check for duplicate asset tags
+        if (itemRepository.existsByAssetTag(item.getAssetTag())) {
+            throw new DuplicateAssetTagException("Asset Tag: '" + item.getAssetTag() + "' is already in use.");
+        }
+
         // Save the item first to generate the ID
         Item savedItem = itemRepository.save(item);
 
