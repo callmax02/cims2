@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.model.Item;
 import com.example.backend.service.ItemService;
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/items")
@@ -38,12 +40,14 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Item> updateItem(@PathVariable Long id, @Valid @RequestBody Item itemDetails) {
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @Valid @RequestBody Item itemDetails) {
         try {
             Item updatedItem = itemService.updateItem(id, itemDetails);
             return ResponseEntity.ok(updatedItem);
+        } catch (DuplicateAssetTagException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(Map.of("error", "Item not found"));
         }
     }
 
