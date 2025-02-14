@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaQrcode, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaQrcode, FaPlus, FaDownload } from "react-icons/fa";
+import { FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -10,7 +11,9 @@ const InventoryTable = () => {
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isViewQRModalOpen, setIsViewQRModalOpen] = useState(false);
 
+  // 1. Fetch items on component load
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -24,10 +27,12 @@ const InventoryTable = () => {
         const itemsWithImages = data.map((item) => ({
           ...item,
           imageUrl: item.image ? `data:image/jpeg;base64,${item.image}` : null,
+          qrCode: item.qrCode && `data:image/jpeg;base64,${item.qrCode}`,
         }));
 
         setItems(itemsWithImages);
       } catch (error) {
+        console.log("1");
         navigate("/dashboard", {
           state: { message: error.message, type: "error" },
         });
@@ -39,6 +44,17 @@ const InventoryTable = () => {
     fetchItems();
   }, []);
 
+  // 2. Helper functions for modals
+  const openViewQRModal = (item) => {
+    setSelectedItem(item);
+    setIsViewQRModalOpen(true);
+  };
+
+  const closeViewQRModal = () => {
+    setIsViewQRModalOpen(false);
+    setSelectedItem(null);
+  };
+
   const openDeleteModal = (item) => {
     setSelectedItem(item);
     setIsDeleteModalOpen(true);
@@ -49,6 +65,25 @@ const InventoryTable = () => {
     setSelectedItem(null);
   };
 
+  // 3. Helper function for saving QR code
+  const saveQRImage = () => {
+    if (!selectedItem?.qrCode) {
+      navigate("/dashboard", {
+        state: { message: "No QR code available to save", type: "error" },
+      });
+
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = selectedItem.qrCode;
+    link.download = `QR_Item_${selectedItem.id}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // 4. Helper function to delete item from db
   const confirmDelete = async () => {
     if (!selectedItem) return;
 
@@ -166,7 +201,7 @@ const InventoryTable = () => {
                       <button
                         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
                         onClick={() => {
-                          navigate(`/saveQR/${item.id}`);
+                          openViewQRModal(item);
                         }}
                       >
                         <FaQrcode />
@@ -182,6 +217,38 @@ const InventoryTable = () => {
           </table>
         </div>
       </div>
+
+      {/* View QR Code Modal */}
+      {isViewQRModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+            <button
+              onClick={closeViewQRModal}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200"
+            >
+              <FiX size={20} />
+            </button>
+            <h2 className="text-center mb-4 font-semibold">
+              QR for Item: {selectedItem.id}
+            </h2>
+            <img
+              src={selectedItem.qrCode}
+              alt={`QR Code for Item ${selectedItem.id}`}
+              className="mx-auto mb-4"
+            />
+            <button
+              className=" mx-auto bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
+              onClick={() => {
+                saveQRImage();
+              }}
+            >
+              <FaDownload className="mr-2" /> Download
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
