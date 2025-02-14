@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { QRCodeCanvas } from "qrcode.react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,6 +26,11 @@ const EditItemForm = () => {
   );
   const [qrPreview, setQrPreview] = useState("https://placehold.co/40x40");
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [qrFromAssetTagTextBox, setQrFromAssetTagTextBox] = useState("");
+
+  const handleAssetTagTextboxBlur = () => {
+    setQrFromAssetTagTextBox(formData.assetTag);
+  };
 
   // Fetch item details
   useEffect(() => {
@@ -149,6 +155,7 @@ const EditItemForm = () => {
               name="assetTag"
               value={formData.assetTag}
               onChange={handleChange}
+              onBlur={handleAssetTagTextboxBlur}
               className="w-full border rounded p-2"
               required
               disabled={isDisabled}
@@ -232,7 +239,11 @@ const EditItemForm = () => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">QR Code</label>
-            {qrPreview && (
+            {qrFromAssetTagTextBox ? (
+              <div className="flex justify-center mt-5">
+                <QRCodeCanvas value={qrFromAssetTagTextBox} size={120} />
+              </div>
+            ) : (
               <div className="flex justify-center mt-5">
                 <img
                   src={qrPreview}
