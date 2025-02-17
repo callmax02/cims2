@@ -111,7 +111,8 @@ const EditItemForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update item");
+        let message = errorData.message.map((e) => e).join(" ");
+        throw new Error(message || "Failed to update item");
       }
 
       navigate("/dashboard", {

@@ -58,7 +58,8 @@ const AddItemForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add item");
+        const message = errorData.message.map((err) => err).join(" ");
+        throw new Error(message || "Failed to add item");
       }
 
       navigate("/dashboard", {
