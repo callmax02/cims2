@@ -38,7 +38,9 @@ const EditItemForm = () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/items/${id}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch item details");
+          const errorData = await response.json();
+          let message = errorData.message.map((e) => e).join(" ");
+          throw new Error(message || "Failed to fetch item details");
         }
         const data = await response.json();
 
