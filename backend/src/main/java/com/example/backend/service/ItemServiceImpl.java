@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.exception.DuplicateAssetTagException;
+import com.example.backend.exception.FailedToGenerateQRException;
 import com.example.backend.exception.ItemNotFoundException;
 import com.example.backend.model.Item;
 import com.example.backend.repository.ItemRepository;
@@ -38,15 +39,12 @@ public class ItemServiceImpl implements ItemService{
             throw new DuplicateAssetTagException(item.getAssetTag());
         });
 
-        // Save the item first to generate the ID
-        Item savedItem = itemRepository.save(item);
-
         // Generate QR code using the assigned ID
-        byte[] qrCode = generateQRCode(savedItem.getAssetTag().toString());
+        byte[] qrCode = generateQRCode(item.getAssetTag().toString());
 
-        // Update the saved item with the generated QR code
-        savedItem.setQrCode(qrCode);
-        return itemRepository.save(savedItem);
+        // Save the item with the generated QR code
+        item.setQrCode(qrCode);
+        return itemRepository.save(item);
     }
 
 
@@ -70,7 +68,7 @@ public class ItemServiceImpl implements ItemService{
             existingItem.setDefaultLocation(itemDetails.getDefaultLocation());
             existingItem.setImage(itemDetails.getImage());
 
-            // Generate QR code using the assigned ID
+            // Regenerate QR based on new asset tag
             byte[] qrCode = generateQRCode(existingItem.getAssetTag().toString());
 
             // Update the saved item with the generated QR code
@@ -95,7 +93,8 @@ public class ItemServiceImpl implements ItemService{
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream);
             return stream.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate QR code", e);
+            // throw new RuntimeException("Failed to generate QR code", e);
+            throw new FailedToGenerateQRException();
         }
     }
 }

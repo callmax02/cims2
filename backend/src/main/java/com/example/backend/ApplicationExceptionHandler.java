@@ -19,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.example.backend.exception.ErrorResponse;
+import com.example.backend.exception.FailedToGenerateQRException;
 import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.exception.ItemNotFoundException;
 
@@ -26,6 +27,12 @@ import com.example.backend.exception.ItemNotFoundException;
 @ControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(FailedToGenerateQRException.class)
+    public ResponseEntity<Object> handleFailedToGenerateQRException(FailedToGenerateQRException ex) {
+        ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
     @ExceptionHandler(DuplicateAssetTagException.class)
     public ResponseEntity<Object> handleDuplicateAssetTagException(DuplicateAssetTagException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
