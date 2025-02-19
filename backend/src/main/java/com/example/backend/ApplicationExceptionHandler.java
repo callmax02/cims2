@@ -21,7 +21,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.example.backend.exception.ErrorResponse;
 import com.example.backend.exception.FailedToGenerateQRException;
 import com.example.backend.exception.DuplicateAssetTagException;
+import com.example.backend.exception.DuplicateEmailException;
 import com.example.backend.exception.ItemNotFoundException;
+import com.example.backend.exception.UserNotFoundException;
 
 
 @ControllerAdvice
@@ -33,13 +35,13 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
-    @ExceptionHandler(DuplicateAssetTagException.class)
-    public ResponseEntity<Object> handleDuplicateAssetTagException(DuplicateAssetTagException ex) {
+    @ExceptionHandler({DuplicateEmailException.class, DuplicateAssetTagException.class})
+    public ResponseEntity<Object> handleDuplicateResourceException(RuntimeException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
     
-    @ExceptionHandler({ItemNotFoundException.class})
+    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class})
     public ResponseEntity<Object> handleResourceNotFoundException(RuntimeException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
