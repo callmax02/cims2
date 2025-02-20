@@ -12,6 +12,8 @@ const InventoryTable = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isViewQRModalOpen, setIsViewQRModalOpen] = useState(false);
+  const [filterText, setFilterText] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
 
   // 1. Fetch items on component load
   useEffect(() => {
@@ -31,6 +33,7 @@ const InventoryTable = () => {
         }));
 
         setItems(itemsWithImages);
+        setFilteredItems(itemsWithImages);
       } catch (error) {
         console.log("1");
         navigate("/dashboard", {
@@ -114,11 +117,29 @@ const InventoryTable = () => {
     }
   };
 
+  useEffect(() => {
+    const filterItems = async () => {
+      setFilteredItems(
+        items.filter((item) =>
+          item.assetTag.toLowerCase().includes(filterText.toLowerCase())
+        )
+      );
+    };
+    filterItems();
+  }, [filterText]);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-6xl bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Inventory Items</h2>
+          <input
+            type="text"
+            placeholder="Filter by Asset Tag..."
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            className="border p-2 rounded-md text-sm flex-1 mx-4"
+          />
           <button
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
             onClick={() => {
@@ -144,75 +165,87 @@ const InventoryTable = () => {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="text-center">
-                  <td className="border border-gray-300 p-2">{item.id}</td>
-                  <td className="border border-gray-300 p-2">
-                    {item.department}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {item.assetTag}
-                  </td>
-                  <td className="border border-gray-300 p-2">{item.serial}</td>
-                  <td className="border border-gray-300 p-2">{item.model}</td>
-                  <td className="border border-gray-300 p-2">{item.status}</td>
-                  <td className="border border-gray-300 p-2">
-                    {item.defaultLocation}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    <img
-                      src={
-                        item.imageUrl
-                          ? item.imageUrl
-                          : "https://placehold.co/40x40"
-                      }
-                      alt="Asset"
-                      className="w-10 h-10 rounded-md"
-                    />
-                  </td>
-                  <td className="border border-gray-300 p-2 flex justify-center space-x-2">
-                    <div className="relative group">
-                      <button
-                        className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
-                        onClick={() => {
-                          navigate(`/editItem/${item.id}`);
-                        }}
-                      >
-                        <FaEdit />
-                      </button>
-                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Edit
-                      </span>
-                    </div>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <tr key={item.id} className="text-center">
+                    <td className="border border-gray-300 p-2">{item.id}</td>
+                    <td className="border border-gray-300 p-2">
+                      {item.department}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {item.assetTag}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {item.serial}
+                    </td>
+                    <td className="border border-gray-300 p-2">{item.model}</td>
+                    <td className="border border-gray-300 p-2">
+                      {item.status}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      {item.defaultLocation}
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      <img
+                        src={
+                          item.imageUrl
+                            ? item.imageUrl
+                            : "https://placehold.co/40x40"
+                        }
+                        alt="Asset"
+                        className="w-10 h-10 rounded-md"
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-2 flex justify-center space-x-2">
+                      <div className="relative group">
+                        <button
+                          className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
+                          onClick={() => {
+                            navigate(`/editItem/${item.id}`);
+                          }}
+                        >
+                          <FaEdit />
+                        </button>
+                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Edit
+                        </span>
+                      </div>
 
-                    <div className="relative group">
-                      <button
-                        onClick={() => openDeleteModal(item)}
-                        className="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center"
-                      >
-                        <FaTrash />
-                      </button>
-                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Delete
-                      </span>
-                    </div>
+                      <div className="relative group">
+                        <button
+                          onClick={() => openDeleteModal(item)}
+                          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center"
+                        >
+                          <FaTrash />
+                        </button>
+                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Delete
+                        </span>
+                      </div>
 
-                    <div className="relative group">
-                      <button
-                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
-                        onClick={() => {
-                          openViewQRModal(item);
-                        }}
-                      >
-                        <FaQrcode />
-                      </button>
-                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Generate QR
-                      </span>
-                    </div>
+                      <div className="relative group">
+                        <button
+                          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
+                          onClick={() => {
+                            openViewQRModal(item);
+                          }}
+                        >
+                          <FaQrcode />
+                        </button>
+                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Generate QR
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center p-4">
+                    No items found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
