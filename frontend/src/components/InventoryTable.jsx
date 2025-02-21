@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import QRScannerModal from "./QRScannerModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -23,6 +24,11 @@ const InventoryTable = () => {
   const [filterText, setFilterText] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleScan = (data) => {
+    setFilterText(data);
+  };
 
   // 1. Fetch items on component load
   useEffect(() => {
@@ -146,7 +152,10 @@ const InventoryTable = () => {
 
           {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-blue-500 text-white px-4 py-2 ml-6 rounded hover:bg-blue-600 flex items-center">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 ml-6 rounded hover:bg-blue-600 flex items-center"
+              onClick={() => setIsModalOpen(true)}
+            >
               Scan QR
             </button>
             <input
@@ -300,6 +309,13 @@ const InventoryTable = () => {
           </table>
         </div>
       </div>
+
+      {/* Scan QR Modal */}
+      <QRScannerModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onScan={handleScan}
+      />
 
       {/* View QR Code Modal */}
       {isViewQRModalOpen && (
