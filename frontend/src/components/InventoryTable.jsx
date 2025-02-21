@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaQrcode, FaPlus, FaDownload } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaQrcode,
+  FaPlus,
+  FaDownload,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +22,7 @@ const InventoryTable = () => {
   const [isViewQRModalOpen, setIsViewQRModalOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // 1. Fetch items on component load
   useEffect(() => {
@@ -132,23 +141,64 @@ const InventoryTable = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-6xl bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
+          {/* Header Section */}
           <h2 className="text-xl font-semibold">Inventory Items</h2>
-          <input
-            type="text"
-            placeholder="Filter by Asset Tag..."
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className="border p-2 rounded-md text-sm flex-1 mx-4"
-          />
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-            onClick={() => {
-              navigate("/addItem");
-            }}
-          >
-            <FaPlus className="mr-2" /> Add Item
-          </button>
+
+          {/* Desktop Controls */}
+          <div className="hidden md:flex items-center space-x-4">
+            <button className="bg-blue-500 text-white px-4 py-2 ml-6 rounded hover:bg-blue-600 flex items-center">
+              Scan QR
+            </button>
+            <input
+              type="text"
+              placeholder="Filter by Asset Tag..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="border p-2 rounded-md text-sm flex-1 mx-4"
+            />
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
+              onClick={() => {
+                navigate("/addItem");
+              }}
+            >
+              <FaPlus className="mr-2" /> Add Item
+            </button>
+          </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-gray-700 p-2"
+            >
+              {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </div>
+        {/* Mobile Menu Dropdown */}
+        {menuOpen && (
+          <div className="md:hidden flex flex-col space-y-2 bg-gray-100 p-4 rounded shadow mb-4">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center w-full">
+              Scan QR
+            </button>
+            <input
+              type="text"
+              placeholder="Filter by Asset Tag..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="border p-2 rounded-md text-sm flex-1"
+            />
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center w-full"
+              onClick={() => {
+                navigate("/addItem");
+              }}
+            >
+              <FaPlus className="mr-2" /> Add Item
+            </button>
+          </div>
+        )}
         <div className="w-full overflow-x-auto">
           <table className="w-full min-w-max border-collapse border border-gray-300 text-sm">
             <thead>
