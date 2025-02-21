@@ -119,6 +119,9 @@ const InventoryTable = () => {
 
       // Remove the deleted item from the state
       setItems(items.filter((item) => item.id !== selectedItem.id));
+      setFilteredItems(
+        filteredItems.filter((item) => item.id !== selectedItem.id)
+      );
       navigate("/dashboard", {
         state: { message: "Item deleted successfully!", type: "success" },
       });
