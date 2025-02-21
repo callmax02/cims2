@@ -114,7 +114,9 @@ const InventoryTable = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete item");
+        const errorData = await response.json();
+        let message = errorData.message.map((e) => e).join(" ");
+        throw new Error(message || "Failed to delete item");
       }
 
       // Remove the deleted item from the state
@@ -191,7 +193,10 @@ const InventoryTable = () => {
         {/* Mobile Menu Dropdown */}
         {menuOpen && (
           <div className="md:hidden flex flex-col space-y-2 bg-gray-100 p-4 rounded shadow mb-4">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center w-full">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center w-full"
+              onClick={() => setIsModalOpen(true)}
+            >
               Scan QR
             </button>
             <input
@@ -202,7 +207,7 @@ const InventoryTable = () => {
               className="border p-2 rounded-md text-sm flex-1"
             />
             <button
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center w-full"
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center justify-center w-full"
               onClick={() => {
                 navigate("/addItem");
               }}
