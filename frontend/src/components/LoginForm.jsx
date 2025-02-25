@@ -2,29 +2,24 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const SignupForm = () => {
+const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = { email: email, password: password };
+    const formData = { email, password };
 
     try {
-      if (password !== confirmPassword) {
-        throw new Error("Password fields don't match.");
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,28 +29,17 @@ const SignupForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        const message = errorData.message.map((err) => err).join(" ");
-        throw new Error(message || "Failed to register new user");
+        throw new Error(errorData.message || "Failed to log in");
       }
 
       navigate("/dashboard", {
-        state: { message: "User registered!", type: "success" },
+        state: { message: "Login successful!", type: "success" },
       });
     } catch (error) {
       toast.error(error.message);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    setPasswordsMatch(e.target.value === confirmPassword);
-  };
-
-  const handleConfirmPasswordChange = (e) => {
-    setConfirmPassword(e.target.value);
-    setPasswordsMatch(e.target.value === password);
   };
 
   return (
@@ -65,7 +49,7 @@ const SignupForm = () => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2" htmlFor="email">
@@ -90,34 +74,11 @@ const SignupForm = () => {
             type="password"
             id="password"
             value={password}
-            onChange={handlePasswordChange}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             disabled={isSubmitting}
           />
-        </div>
-
-        <div className="mb-4">
-          <label
-            className="block text-sm font-medium mb-2"
-            htmlFor="confirmPassword"
-          >
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-            className={`w-full border rounded p-2 focus:outline-none focus:ring-2 ${
-              passwordsMatch ? "focus:ring-blue-500" : "focus:ring-red-500"
-            }`}
-            required
-            disabled={isSubmitting}
-          />
-          {!passwordsMatch && (
-            <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
-          )}
         </div>
 
         <button
@@ -125,11 +86,18 @@ const SignupForm = () => {
           className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
           disabled={isSubmitting}
         >
-          Register
+          Login
         </button>
+
+        <p className="text-center text-sm mt-4">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Sign up here
+          </Link>
+        </p>
       </form>
     </div>
   );
 };
 
-export default SignupForm;
+export default LoginForm;
