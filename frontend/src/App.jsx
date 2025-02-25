@@ -5,6 +5,7 @@ import AddItemPage from "./pages/AddItemPage";
 import EditItemPage from "./pages/EditItemPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
+import UsersPage from "./pages/UsersPage";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route exact path="/editItem/:id" element={<EditItemPage />} />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route exact path="/" element={<LoginPage />} />
+          <Route exact path="/users" element={<UsersPage />} />
         </Routes>
       </BrowserRouter>
     </>
