@@ -1,13 +1,14 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.LoginRequest;
 import com.example.backend.exception.DuplicateEmailException;
+import com.example.backend.exception.InvalidLoginCredentialsException;
 import com.example.backend.exception.UserNotFoundException;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,15 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+
+    public User login(LoginRequest loginRequest) {
+        
+        // Check if the user exists in the database
+        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
+            .orElseThrow(() -> new InvalidLoginCredentialsException());
+
+        return user;
+    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -35,14 +44,13 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateEmailException(user.getEmail());
         });
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
         return userRepository.save(user);
     }
 
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id).map(existingUser -> {
             existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            existingUser.setPassword(updatedUser.getPassword());
             
             return userRepository.save(existingUser);
             

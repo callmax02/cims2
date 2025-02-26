@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.LoginRequest;
 import com.example.backend.model.User;
 import com.example.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -17,6 +18,12 @@ import lombok.AllArgsConstructor;
 @CrossOrigin(origins = "http://localhost:5173") // Allow only your React frontend
 public class UserController {
     private UserService userService;
+
+    @PostMapping("/login")
+    public ResponseEntity<HttpStatus> login(@RequestBody LoginRequest loginRequest) {
+        userService.login(loginRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {

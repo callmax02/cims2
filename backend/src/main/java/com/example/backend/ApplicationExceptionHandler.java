@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.example.backend.exception.ErrorResponse;
 import com.example.backend.exception.FailedToGenerateQRException;
+import com.example.backend.exception.InvalidLoginCredentialsException;
 import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.exception.DuplicateEmailException;
 import com.example.backend.exception.ItemNotFoundException;
@@ -29,6 +30,12 @@ import com.example.backend.exception.UserNotFoundException;
 @ControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(InvalidLoginCredentialsException.class)
+    public ResponseEntity<Object> handleInvalidLoginCredentialsException(InvalidLoginCredentialsException ex) {
+        ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+    
     @ExceptionHandler(FailedToGenerateQRException.class)
     public ResponseEntity<Object> handleFailedToGenerateQRException(FailedToGenerateQRException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  

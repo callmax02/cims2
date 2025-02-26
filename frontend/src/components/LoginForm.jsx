@@ -19,7 +19,7 @@ const LoginForm = () => {
     const formData = { email, password };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,7 +29,8 @@ const LoginForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to log in");
+        const message = errorData.message.map((err) => err).join(" ");
+        throw new Error(message || "Failed to login");
       }
 
       navigate("/dashboard", {
