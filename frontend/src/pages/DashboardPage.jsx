@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InventoryTable from "../components/InventoryTable";
+import Header from "../components/Header";
 
 const DashboardPage = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const DashboardPage = () => {
   return (
     <div>
       <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
+      <Header />
       <InventoryTable />
     </div>
   );
