@@ -37,14 +37,14 @@ const Header = () => {
           {user?.role === "ADMIN" && (
             <Link
               to="/users"
-              className="flex items-center text-gray-700 hover:text-blue-500 space-x-2"
+              className="flex items-center hover:text-blue-500 space-x-2"
             >
               <FaUsers /> <span>Users</span>
             </Link>
           )}
           <Link
             to="/items"
-            className="flex items-center text-gray-700 hover:text-blue-500 space-x-2"
+            className="flex items-center hover:text-blue-500 space-x-2"
           >
             <FaBox /> <span>Items</span>
           </Link>
@@ -52,11 +52,11 @@ const Header = () => {
           {/* User Dropdown (State-Based) */}
           <div className="relative">
             <button
-              className="flex items-center space-x-3 text-gray-700 hover:text-blue-500"
+              className="flex items-center space-x-2 hover:text-blue-500"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <FaUserCircle className="text-2xl" />
-              <span className="font-medium">{user?.name}</span>
+              <span>{user?.name}</span>
               {dropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
             </button>
 
@@ -65,7 +65,7 @@ const Header = () => {
               <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg">
                 <Link
                   to="/profile"
-                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 space-x-2"
+                  className="flex items-center px-4 py-2 hover:bg-gray-100 space-x-2"
                   onClick={() => setDropdownOpen(false)}
                 >
                   <FaUser /> <span>My Profile</span>
@@ -75,7 +75,7 @@ const Header = () => {
                     setDropdownOpen(false);
                     onSignOut();
                   }}
-                  className="w-full text-left flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 space-x-2"
+                  className="w-full text-left flex items-center px-4 py-2 hover:bg-gray-100 space-x-2"
                 >
                   <FaSignOutAlt /> <span>Sign Out</span>
                 </button>
@@ -97,28 +97,19 @@ const Header = () => {
       {menuOpen && (
         <div className="md:hidden bg-gray-100 p-4 mt-2 rounded-lg shadow space-y-3">
           {user?.role === "ADMIN" && (
-            <Link
-              to="/users"
-              className="flex items-center text-gray-700 py-2 space-x-2"
-            >
+            <Link to="/users" className="flex items-center py-2 space-x-2">
               <FaUsers /> <span>Users</span>
             </Link>
           )}
-          <Link
-            to="/items"
-            className="flex items-center text-gray-700 py-2 space-x-2"
-          >
+          <Link to="/items" className="flex items-center py-2 space-x-2">
             <FaBox /> <span>Items</span>
           </Link>
-          <Link
-            to="/profile"
-            className="flex items-center text-gray-700 py-2 space-x-2"
-          >
+          <Link to="/profile" className="flex items-center py-2 space-x-2">
             <FaUser /> <span>My Profile</span>
           </Link>
           <button
             onClick={handleSignOut}
-            className="flex items-center text-gray-700 py-2 w-full text-left space-x-2"
+            className="flex items-center py-2 w-full text-left space-x-2"
           >
             <FaSignOutAlt /> <span>Sign Out</span>
           </button>

@@ -149,7 +149,7 @@ const InventoryTable = () => {
   }, [filterText]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-6xl bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           {/* Header Section */}
