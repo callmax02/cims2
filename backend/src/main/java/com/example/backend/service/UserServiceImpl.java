@@ -1,8 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.LoginRequest;
 import com.example.backend.exception.DuplicateEmailException;
-import com.example.backend.exception.InvalidLoginCredentialsException;
 import com.example.backend.exception.UserNotFoundException;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
@@ -18,15 +16,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     
     private UserRepository userRepository;
-
-    public User login(LoginRequest loginRequest) {
-        
-        // Check if the user exists in the database
-        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
-            .orElseThrow(() -> new InvalidLoginCredentialsException());
-
-        return user;
-    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();

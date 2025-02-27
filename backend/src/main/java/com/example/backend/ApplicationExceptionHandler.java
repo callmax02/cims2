@@ -25,6 +25,7 @@ import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.exception.DuplicateEmailException;
 import com.example.backend.exception.ItemNotFoundException;
 import com.example.backend.exception.UserNotFoundException;
+import com.example.backend.exception.UserWithEmailNotFoundException;
 
 
 @ControllerAdvice
@@ -48,7 +49,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
     
-    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class})
+    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class, UserWithEmailNotFoundException.class})
     public ResponseEntity<Object> handleResourceNotFoundException(RuntimeException ex) {
         ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);

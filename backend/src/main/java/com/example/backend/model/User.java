@@ -32,8 +32,5 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    public void setPassword(String password) {
-        this.password = new BCryptPasswordEncoder().encode(password);
-    }
+    
 }
