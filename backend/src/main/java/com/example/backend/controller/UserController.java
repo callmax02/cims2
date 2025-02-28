@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173") // Allow only your React frontend
 public class UserController {
     private UserService userService;
 

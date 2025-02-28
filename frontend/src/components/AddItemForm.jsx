@@ -47,11 +47,14 @@ const AddItemForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const token = localStorage.getItem("token");
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });

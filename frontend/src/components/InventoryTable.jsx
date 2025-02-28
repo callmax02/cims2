@@ -33,11 +33,19 @@ const InventoryTable = () => {
   // 1. Fetch items on component load
   useEffect(() => {
     const fetchItems = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`${API_BASE_URL}/api/items`);
+        const response = await fetch(`${API_BASE_URL}/api/items`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch items");
         }
+
         const data = await response.json();
 
         // Convert Base64 strings to proper image URLs
@@ -50,7 +58,6 @@ const InventoryTable = () => {
         setItems(itemsWithImages);
         setFilteredItems(itemsWithImages);
       } catch (error) {
-        console.log("1");
         navigate("/dashboard", {
           state: { message: error.message, type: "error" },
         });
@@ -105,11 +112,16 @@ const InventoryTable = () => {
   const confirmDelete = async () => {
     if (!selectedItem) return;
 
+    const token = localStorage.getItem("token");
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/items/${selectedItem.id}`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -146,7 +158,7 @@ const InventoryTable = () => {
       );
     };
     filterItems();
-  }, [filterText]);
+  }, [filterText, items]);
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-4">

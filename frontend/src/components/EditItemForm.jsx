@@ -35,8 +35,13 @@ const EditItemForm = () => {
   // Fetch item details
   useEffect(() => {
     const fetchItem = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`${API_BASE_URL}/api/items/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           const errorData = await response.json();
           let message = errorData.message.map((e) => e).join(" ");
@@ -102,11 +107,14 @@ const EditItemForm = () => {
     e.preventDefault();
     setIsDisabled(true);
 
+    const token = localStorage.getItem("token");
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/items/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });

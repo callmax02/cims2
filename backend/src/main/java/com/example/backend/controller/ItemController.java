@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/items")
-@CrossOrigin(origins = "http://localhost:5173") // Allow only your React frontend
 public class ItemController {
 
     private ItemService itemService;
