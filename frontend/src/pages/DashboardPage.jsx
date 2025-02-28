@@ -19,7 +19,7 @@ const DashboardPage = () => {
   }, [location.state]);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <Header />
       <InventoryTable />

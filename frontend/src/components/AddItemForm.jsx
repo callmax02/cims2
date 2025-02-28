@@ -89,7 +89,7 @@ const AddItemForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div>
       <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <form
         onSubmit={handleSubmit}
