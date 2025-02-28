@@ -33,6 +33,9 @@ const LoginForm = () => {
         throw new Error(message || "Failed to login");
       }
 
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+
       navigate("/dashboard", {
         state: { message: "Login successful!", type: "success" },
       });

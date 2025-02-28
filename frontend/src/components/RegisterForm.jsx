@@ -8,9 +8,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const RegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("user");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const navigate = useNavigate();
 
@@ -18,14 +20,14 @@ const RegisterForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = { email: email, password: password };
+    const formData = { name, email, password, role };
 
     try {
       if (password !== confirmPassword) {
         throw new Error("Password fields don't match.");
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +41,7 @@ const RegisterForm = () => {
         throw new Error(message || "Failed to register new user");
       }
 
-      navigate("/dashboard", {
+      navigate("/", {
         state: { message: "User registered!", type: "success" },
       });
     } catch (error) {
@@ -67,6 +69,21 @@ const RegisterForm = () => {
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2" htmlFor="name">
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            disabled={isSubmitting}
+          />
+        </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2" htmlFor="email">
@@ -119,6 +136,24 @@ const RegisterForm = () => {
           {!passwordsMatch && (
             <p className="text-red-500 text-sm mt-1">Passwords do not match.</p>
           )}
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2" htmlFor="role">
+            Role
+          </label>
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border text-sm rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            disabled={isSubmitting}
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="superadmin">Superadmin</option>
+          </select>
         </div>
 
         <button
