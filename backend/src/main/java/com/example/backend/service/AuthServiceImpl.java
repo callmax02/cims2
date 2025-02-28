@@ -8,6 +8,8 @@ import com.example.backend.exception.InvalidLoginCredentialsException;
 import com.example.backend.exception.UserWithEmailNotFoundException;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.security.JwtUtil;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
@@ -17,7 +19,7 @@ import lombok.AllArgsConstructor;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
 
     public User register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -44,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // Generate JWT token
-        String token = jwtService.generateToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
         return new AuthResponse(token);
     }
