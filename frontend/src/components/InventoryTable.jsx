@@ -45,7 +45,6 @@ const InventoryTable = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch items");
         }
-
         const data = await response.json();
 
         // Convert Base64 strings to proper image URLs
@@ -275,45 +274,47 @@ const InventoryTable = () => {
                         className="w-10 h-10 rounded-md"
                       />
                     </td>
-                    <td className="border border-gray-300 p-2 flex justify-center space-x-2">
-                      <div className="relative group">
-                        <button
-                          className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
-                          onClick={() => {
-                            navigate(`/editItem/${item.id}`);
-                          }}
-                        >
-                          <FaEdit />
-                        </button>
-                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          Edit
-                        </span>
-                      </div>
+                    <td className="border border-gray-300 p-2">
+                      <div className="flex justify-center space-x-1">
+                        <div className="relative group">
+                          <button
+                            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center"
+                            onClick={() => {
+                              navigate(`/editItem/${item.id}`);
+                            }}
+                          >
+                            <FaEdit />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Edit
+                          </span>
+                        </div>
 
-                      <div className="relative group">
-                        <button
-                          onClick={() => openDeleteModal(item)}
-                          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center"
-                        >
-                          <FaTrash />
-                        </button>
-                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          Delete
-                        </span>
-                      </div>
+                        <div className="relative group">
+                          <button
+                            onClick={() => openDeleteModal(item)}
+                            className="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center"
+                          >
+                            <FaTrash />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Delete
+                          </span>
+                        </div>
 
-                      <div className="relative group">
-                        <button
-                          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
-                          onClick={() => {
-                            openViewQRModal(item);
-                          }}
-                        >
-                          <FaQrcode />
-                        </button>
-                        <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          Generate QR
-                        </span>
+                        <div className="relative group">
+                          <button
+                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 flex items-center"
+                            onClick={() => {
+                              openViewQRModal(item);
+                            }}
+                          >
+                            <FaQrcode />
+                          </button>
+                          <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Generate QR
+                          </span>
+                        </div>
                       </div>
                     </td>
                   </tr>
