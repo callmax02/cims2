@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -19,7 +17,7 @@ const LoginForm = () => {
     const formData = { email, password };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +38,9 @@ const LoginForm = () => {
         state: { message: "Login successful!", type: "success" },
       });
     } catch (error) {
-      toast.error(error.message);
+      navigate(".", {
+        state: { replace: true, message: error.message, type: "error" },
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -48,7 +48,6 @@ const LoginForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
