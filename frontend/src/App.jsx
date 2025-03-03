@@ -46,7 +46,7 @@ const App = () => {
             exact
             path="/users"
             element={
-              <PrivateRoute>
+              <PrivateRoute roles={["admin", "superadmin"]}>
                 <UsersPage />
               </PrivateRoute>
             }

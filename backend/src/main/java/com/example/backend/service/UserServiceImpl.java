@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.exception.DuplicateEmailException;
 import com.example.backend.exception.UserNotFoundException;
+import com.example.backend.model.Role;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 
@@ -33,6 +34,13 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateEmailException(user.getEmail());
         });
 
+        return userRepository.save(user);
+    }
+
+    public User updateUserRole(Long id, Role newRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        user.setRole(newRole);
         return userRepository.save(user);
     }
 
