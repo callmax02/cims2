@@ -52,7 +52,7 @@ const Header = () => {
             </Link>
           )}
           <Link
-            to="/items"
+            to="/dashboard"
             className="flex items-center hover:text-blue-500 space-x-2"
           >
             <FaBox /> <span>Items</span>

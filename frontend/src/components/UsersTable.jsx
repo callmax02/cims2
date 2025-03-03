@@ -1,31 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [selectedType, setSelectedType] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    // Mock data for users
-    const mockUsers = [
-      { id: 1, name: "John Doe", email: "john@example.com", type: "Admin" },
-      { id: 2, name: "Jane Smith", email: "jane@example.com", type: "User" },
-    ];
-    setUsers(mockUsers);
+    const fetchUsers = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/users`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    const initialTypes = {};
-    mockUsers.forEach((user) => {
-      initialTypes[user.id] = user.type;
-    });
-    setSelectedType(initialTypes);
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const data = await response.json();
+        setUsers(data);
+
+        const initialTypes = data.reduce((acc, user) => {
+          const role = user.role ? user.role.toLowerCase() : "user";
+          acc[user.id] = role;
+          return acc;
+        }, {});
+
+        setSelectedType(initialTypes);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const handleTypeChange = (userId, type) => {
     setSelectedType((prev) => ({ ...prev, [userId]: type }));
   };
 
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedUser) return;
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/${selectedUser.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      setUsers(users.filter((user) => user.id !== selectedUser.id));
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    } finally {
+      closeDeleteModal();
+    }
+  };
+
+  if (loading) return <p className="text-center">Loading users...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-col items-center p-4">
       <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Users</h2>
         <div className="w-full overflow-x-auto">
@@ -47,35 +115,29 @@ const UsersTable = () => {
                   <td className="border border-gray-300 p-2">{user.email}</td>
                   <td className="border border-gray-300 p-2">
                     <select
-                      name={`type-${user.id}`}
-                      value={selectedType[user.id] || "User"}
+                      value={selectedType[user.id]}
                       onChange={(e) =>
                         handleTypeChange(user.id, e.target.value)
                       }
-                      className="w-40 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      className="w-40 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="User">User</option>
-                      <option value="Admin">Admin</option>
-                      <option value="SuperAdmin">Super Admin</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="superadmin">Super Admin</option>
                     </select>
                   </td>
-                  <td className="border border-gray-300 p-2 flex justify-center space-x-2">
-                    <div className="relative group">
-                      <button className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 flex items-center">
+                  <td className="border border-gray-300 p-2 text-center">
+                    <div className="inline-flex space-x-2">
+                      <button className="bg-yellow-500 text-white p-1.5 rounded hover:bg-yellow-600 flex items-center">
                         <FaEdit />
                       </button>
-                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Edit
-                      </span>
-                    </div>
 
-                    <div className="relative group">
-                      <button className="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center">
+                      <button
+                        onClick={() => openDeleteModal(user)}
+                        className="bg-red-500 text-white p-1.5 rounded hover:bg-red-600 flex items-center"
+                      >
                         <FaTrash />
                       </button>
-                      <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Delete
-                      </span>
                     </div>
                   </td>
                 </tr>
@@ -84,6 +146,34 @@ const UsersTable = () => {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+            <h3 className="text-lg font-semibold mb-4">
+              Cancel Deleting User?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this user?
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Delete
+              </button>
+              <button
+                onClick={closeDeleteModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

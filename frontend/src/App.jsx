@@ -6,18 +6,51 @@ import EditItemPage from "./pages/EditItemPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import UsersPage from "./pages/UsersPage";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App = () => {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route exact path="/dashboard" element={<DashboardPage />} />
-          <Route exact path="/addItem" element={<AddItemPage />} />
-          <Route exact path="/editItem/:id" element={<EditItemPage />} />
+          <Route
+            exact
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            exact
+            path="/addItem"
+            element={
+              <PrivateRoute>
+                <AddItemPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            exact
+            path="/editItem/:id"
+            element={
+              <PrivateRoute>
+                <EditItemPage />
+              </PrivateRoute>
+            }
+          />
           <Route exact path="/register" element={<RegisterPage />} />
           <Route exact path="/" element={<LoginPage />} />
-          <Route exact path="/users" element={<UsersPage />} />
+          <Route
+            exact
+            path="/users"
+            element={
+              <PrivateRoute>
+                <UsersPage />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </>
