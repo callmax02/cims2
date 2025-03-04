@@ -16,7 +16,9 @@ import com.example.backend.model.Role;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -44,12 +46,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String email = jwtUtil.extractEmail(token);
         Role role = jwtUtil.extractRole(token);
+        Long userId = jwtUtil.extractId(token); // Extract user ID
         String authority = "ROLE_" + role.name().toUpperCase();
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(authority));
 
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(email, null, authorities);
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        // Create a map to hold authentication details including user ID
+        Map<String, Object> details = new HashMap<>();
+        details.put("webDetails", new WebAuthenticationDetailsSource().buildDetails(request));
+        details.put("userId", userId); // Add user ID to details
+        authToken.setDetails(details);
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
         chain.doFilter(request, response);

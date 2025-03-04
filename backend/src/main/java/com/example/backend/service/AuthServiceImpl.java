@@ -10,12 +10,16 @@ import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtil;
 
+import java.util.Map;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-@Service
+@Service("authServiceImpl")
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -49,6 +53,20 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
         return new AuthResponse(token);
+    }
+
+    public boolean isNotSelf(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        Object details = authentication.getDetails();
+        if (details instanceof Map) {
+            Map<?, ?> detailsMap = (Map<?, ?>) details;
+            Long currentUserId = (Long) detailsMap.get("userId");
+            return currentUserId != null && !currentUserId.equals(userId);
+        }
+        return false;
     }
 
 }

@@ -44,8 +44,11 @@ public class UserController {
     }
 
     @PutMapping("/{id}/role")
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
-    public ResponseEntity<User> updateUserRole(@PathVariable Long id, @Valid @RequestBody RoleUpdateRequest roleUpdateRequest) {
+    @PreAuthorize("hasRole('SUPERADMIN') and @authServiceImpl.isNotSelf(#id)")
+    public ResponseEntity<User> updateUserRole(
+        @PathVariable Long id, 
+        @Valid @RequestBody RoleUpdateRequest roleUpdateRequest
+    ) {
         User updatedUser = userService.updateUserRole(id, roleUpdateRequest.getRole());
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }

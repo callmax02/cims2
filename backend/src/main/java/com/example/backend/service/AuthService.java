@@ -9,4 +9,5 @@ public interface AuthService {
 
     public User register(RegisterRequest request);
     public AuthResponse login(AuthRequest request);
+    public boolean isNotSelf(Long userId);
 }
