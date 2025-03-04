@@ -38,8 +38,9 @@ const LoginForm = () => {
         state: { message: "Login successful!", type: "success" },
       });
     } catch (error) {
-      navigate(".", {
-        state: { replace: true, message: error.message, type: "error" },
+      navigate(location.pathname, {
+        replace: true,
+        state: { message: error.message, type: "error" },
       });
     } finally {
       setIsSubmitting(false);

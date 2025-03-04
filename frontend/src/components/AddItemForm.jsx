@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,7 +36,10 @@ const AddItemForm = () => {
       };
       reader.onerror = (error) => {
         console.error("Error reading file:", error);
-        toast.error("Failed to load image");
+        navigate(location.pathname, {
+          replace: true,
+          state: { message: "Failed to load image", type: "error" },
+        });
       };
     }
   };
@@ -69,7 +70,10 @@ const AddItemForm = () => {
         state: { message: "Item inserted!", type: "success" },
       });
     } catch (error) {
-      toast.error(error.message);
+      navigate(location.pathname, {
+        replace: true,
+        state: { message: error.message, type: "error" },
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -89,8 +93,7 @@ const AddItemForm = () => {
   };
 
   return (
-    <div>
-      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
+    <div className="flex flex-col items-center p-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"

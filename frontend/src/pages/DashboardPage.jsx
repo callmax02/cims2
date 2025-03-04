@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import InventoryTable from "../components/InventoryTable";
 import Header from "../components/Header";
+import { useLocation, useNavigate } from "react-router-dom"; // Add useNavigate
+import { toast, ToastContainer } from "react-toastify";
 
 const DashboardPage = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     if (location.state?.message) {
@@ -15,8 +15,10 @@ const DashboardPage = () => {
       } else {
         toast.error(location.state.message);
       }
+      // Clear the state after showing the toast
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]); // Add dependencies
 
   return (
     <div className="min-h-screen bg-gray-100">

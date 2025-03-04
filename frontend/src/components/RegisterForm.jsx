@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router";
 
@@ -45,7 +44,10 @@ const RegisterForm = () => {
         state: { message: "User registered!", type: "success" },
       });
     } catch (error) {
-      toast.error(error.message);
+      navigate(location.pathname, {
+        replace: true,
+        state: { message: error.message, type: "error" },
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -63,7 +65,6 @@ const RegisterForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"

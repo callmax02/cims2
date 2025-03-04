@@ -51,7 +51,8 @@ const UsersTable = () => {
 
         setSelectedType(initialTypes);
       } catch (error) {
-        navigate("/users", {
+        navigate(location.pathname, {
+          replace: true,
           state: { message: error.message, type: "error" },
         });
       } finally {
@@ -91,7 +92,8 @@ const UsersTable = () => {
         )
       );
 
-      navigate("/users", {
+      navigate(location.pathname, {
+        replace: true,
         state: { message: "User updated successfully!", type: "success" },
       });
     } catch (error) {
@@ -104,7 +106,9 @@ const UsersTable = () => {
           [userId]: user.role.toLowerCase(),
         }));
       }
-      navigate("/users", {
+
+      navigate(location.pathname, {
+        replace: true,
         state: { message: error.message, type: "error" },
       });
     }
@@ -142,11 +146,13 @@ const UsersTable = () => {
 
       setUsers(users.filter((user) => user.id !== selectedUser.id));
 
-      navigate("/users", {
+      navigate(location.pathname, {
+        replace: true,
         state: { message: "User deleted successfully!", type: "success" },
       });
     } catch (error) {
-      navigate("/users", {
+      navigate(location.pathname, {
+        replace: true,
         state: { message: error.message, type: "error" },
       });
     } finally {

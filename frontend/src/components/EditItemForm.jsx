@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { QRCodeCanvas } from "qrcode.react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -70,7 +68,10 @@ const EditItemForm = () => {
           setQrPreview(`data:image/jpeg;base64,${data.qrCode}`);
         }
       } catch (err) {
-        toast.error(err.message);
+        navigate(location.pathname, {
+          replace: true,
+          state: { message: err.message, type: "error" },
+        });
       } finally {
         setIsDisabled(false);
       }
@@ -97,7 +98,10 @@ const EditItemForm = () => {
       };
       reader.onerror = (error) => {
         console.error("Error reading file:", error);
-        toast.error("Failed to load image");
+        navigate(location.pathname, {
+          replace: true,
+          state: { message: "Failed to load image", type: "error" },
+        });
       };
     }
   };
@@ -129,15 +133,17 @@ const EditItemForm = () => {
         state: { message: "Item edited!", type: "success" },
       });
     } catch (err) {
-      toast.error(err.message);
+      navigate(location.pathname, {
+        replace: true,
+        state: { message: err.message, type: "error" },
+      });
     } finally {
       setIsDisabled(false);
     }
   };
 
   return (
-    <div>
-      <ToastContainer pauseOnFocusLoss={false} autoClose={3000} />
+    <div className="flex flex-col items-center p-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"

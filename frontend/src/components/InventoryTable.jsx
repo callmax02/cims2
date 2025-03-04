@@ -57,7 +57,8 @@ const InventoryTable = () => {
         setItems(itemsWithImages);
         setFilteredItems(itemsWithImages);
       } catch (error) {
-        navigate("/dashboard", {
+        navigate(location.pathname, {
+          replace: true,
           state: { message: error.message, type: "error" },
         });
       } finally {
@@ -92,7 +93,8 @@ const InventoryTable = () => {
   // 3. Helper function for saving QR code
   const saveQRImage = () => {
     if (!selectedItem?.qrCode) {
-      navigate("/dashboard", {
+      navigate(location.pathname, {
+        replace: true,
         state: { message: "No QR code available to save", type: "error" },
       });
 
@@ -135,12 +137,16 @@ const InventoryTable = () => {
       setFilteredItems(
         filteredItems.filter((item) => item.id !== selectedItem.id)
       );
-      navigate("/dashboard", {
+
+      navigate(location.pathname, {
+        replace: true,
         state: { message: "Item deleted successfully!", type: "success" },
       });
     } catch (error) {
       console.error("Error deleting item:", error);
-      navigate("/dashboard", {
+
+      navigate(location.pathname, {
+        replace: true,
         state: { message: error.message, type: "error" },
       });
     } finally {
