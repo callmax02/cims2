@@ -4,7 +4,9 @@ import com.example.backend.dto.AuthResponse;
 import com.example.backend.dto.AuthRequest;
 import com.example.backend.dto.RegisterRequest;
 import com.example.backend.exception.DuplicateEmailException;
+import com.example.backend.exception.InsufficientPrivilegesException;
 import com.example.backend.exception.InvalidLoginCredentialsException;
+import com.example.backend.exception.SelfOperationException;
 import com.example.backend.exception.UserWithEmailNotFoundException;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
@@ -55,18 +57,56 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(token);
     }
 
-    public boolean isNotSelf(Long userId) {
+    public boolean isNotSelf(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            return false;
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InsufficientPrivilegesException("Authentication required");
         }
-        Object details = authentication.getDetails();
-        if (details instanceof Map) {
-            Map<?, ?> detailsMap = (Map<?, ?>) details;
-            Long currentUserId = (Long) detailsMap.get("userId");
-            return currentUserId != null && !currentUserId.equals(userId);
+    
+        // Get user ID from authentication details
+        Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
+        Long currentUserId = (Long) details.get("userId");
+    
+        if (currentUserId == null) {
+            throw new SecurityException("User ID not found in authentication details");
         }
-        return false;
+    
+        if (currentUserId.equals(id)) {
+            throw new SelfOperationException("You cannot modify your own role or delete your account");
+        }
+    
+        return true;
+    }
+
+    public boolean checkSuperAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InsufficientPrivilegesException("Authentication required");
+        }
+        boolean isSuperAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_SUPERADMIN"));
+        if (!isSuperAdmin) {
+            throw new InsufficientPrivilegesException("Insufficient privileges: SUPERADMIN role required");
+        }
+        return true;
+    }
+
+    public boolean checkAdminOrSuperAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InsufficientPrivilegesException("Authentication required");
+        }
+        
+        boolean hasRequiredRole = authentication.getAuthorities().stream()
+            .anyMatch(grantedAuthority -> {
+                String authority = grantedAuthority.getAuthority();
+                return authority.equals("ROLE_ADMIN") || authority.equals("ROLE_SUPERADMIN");
+            });
+        
+        if (!hasRequiredRole) {
+            throw new InsufficientPrivilegesException("Insufficient privileges: ADMIN or SUPERADMIN role required");
+        }
+        return true;
     }
 
 }

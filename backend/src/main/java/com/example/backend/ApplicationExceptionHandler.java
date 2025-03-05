@@ -20,16 +20,36 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.example.backend.exception.ErrorResponse;
 import com.example.backend.exception.FailedToGenerateQRException;
+import com.example.backend.exception.InsufficientPrivilegesException;
 import com.example.backend.exception.InvalidLoginCredentialsException;
 import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.exception.DuplicateEmailException;
 import com.example.backend.exception.ItemNotFoundException;
+import com.example.backend.exception.SelfOperationException;
 import com.example.backend.exception.UserNotFoundException;
 import com.example.backend.exception.UserWithEmailNotFoundException;
 
 
 @ControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<Object> handleSecurityException(SecurityException ex) {
+        ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(SelfOperationException.class)
+    public ResponseEntity<Object> handleSelfOperationException(SelfOperationException ex) {
+        ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED); // 401 status
+    }
+
+    @ExceptionHandler(InsufficientPrivilegesException.class)
+    public ResponseEntity<Object> handleInsufficientPrivilegesException(InsufficientPrivilegesException ex) {
+        ErrorResponse error = new ErrorResponse(Arrays.asList(ex.getMessage()));  
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(InvalidLoginCredentialsException.class)
     public ResponseEntity<Object> handleInvalidLoginCredentialsException(InvalidLoginCredentialsException ex) {

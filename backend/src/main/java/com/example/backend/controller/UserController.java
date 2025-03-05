@@ -20,31 +20,31 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+    @PreAuthorize("@authServiceImpl.checkAdminOrSuperAdmin()")
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
+    @PreAuthorize("@authServiceImpl.checkAdminOrSuperAdmin()")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("@authServiceImpl.checkSuperAdmin()")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("@authServiceImpl.checkSuperAdmin()")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User userDetails) {
         return new ResponseEntity<>(userService.updateUser(id, userDetails), HttpStatus.OK);
     }
 
     @PutMapping("/{id}/role")
-    @PreAuthorize("hasRole('SUPERADMIN') and @authServiceImpl.isNotSelf(#id)")
+    @PreAuthorize("@authServiceImpl.checkSuperAdmin() and @authServiceImpl.isNotSelf(#id)")
     public ResponseEntity<User> updateUserRole(
         @PathVariable Long id, 
         @Valid @RequestBody RoleUpdateRequest roleUpdateRequest
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PreAuthorize("@authServiceImpl.checkSuperAdmin() and @authServiceImpl.isNotSelf(#id)")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
