@@ -63,19 +63,25 @@ public class AuthServiceImpl implements AuthService {
             throw new InsufficientPrivilegesException("Authentication required");
         }
     
-        // Get user ID from authentication details
-        Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
-        Long currentUserId = (Long) details.get("userId");
+        try {
+            // Safely cast authentication details
+            Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
+            Long currentUserId = (Long) details.get("userId");
     
-        if (currentUserId == null) {
-            throw new SecurityException("User ID not found in authentication details");
+            if (currentUserId == null) {
+                throw new SecurityException("User ID not found in authentication details");
+            }
+    
+            if (currentUserId.equals(id)) {
+                throw new SelfOperationException("You cannot modify your own role or delete your account");
+            }
+    
+            return true;
+        } catch (ClassCastException e) {
+            throw new SecurityException("Invalid authentication details structure");
+        } catch (NullPointerException e) {
+            throw new SecurityException("Authentication details missing required information");
         }
-    
-        if (currentUserId.equals(id)) {
-            throw new SelfOperationException("You cannot modify your own role or delete your account");
-        }
-    
-        return true;
     }
 
     public boolean checkSuperAdmin() {

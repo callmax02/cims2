@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import com.example.backend.exception.InvalidJwtException;
 import com.example.backend.model.Role;
 
 import java.security.Key;
@@ -34,7 +35,8 @@ public class JwtUtil {
                         "role", role.name()
                 ))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour expiry
+                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour expiry
+                // .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // For testing only: 1 minute expiry
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -74,10 +76,14 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            extractAllClaims(token); // This will throw an exception if the token is invalid
-            return extractExpiration(token).after(new Date());
+            Claims claims = extractAllClaims(token);
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                throw new InvalidJwtException("Session expired. Please login again.");
+            }
+            return true;
         } catch (Exception e) {
-            return false;
+            throw new InvalidJwtException("Invalid session. Please login again.");
         }
     }
 
