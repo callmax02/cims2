@@ -60,7 +60,7 @@ public class ItemServiceImpl implements ItemService{
             }
     
             // Update fields
-            existingItem.setDepartment(itemDetails.getDepartment());
+            existingItem.setAssigningDepartment(itemDetails.getAssigningDepartment());
             existingItem.setAssetTag(itemDetails.getAssetTag());
             existingItem.setSerial(itemDetails.getSerial());
             existingItem.setModel(itemDetails.getModel());

@@ -238,7 +238,9 @@ const InventoryTable = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Department</th>
+                <th className="border border-gray-300 p-2">
+                  Assigning Department
+                </th>
                 <th className="border border-gray-300 p-2">Asset Tag</th>
                 <th className="border border-gray-300 p-2">Serial</th>
                 <th className="border border-gray-300 p-2">Model</th>
@@ -254,7 +256,7 @@ const InventoryTable = () => {
                   <tr key={item.id} className="text-center">
                     <td className="border border-gray-300 p-2">{item.id}</td>
                     <td className="border border-gray-300 p-2">
-                      {item.department}
+                      {item.assigningDepartment}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {item.assetTag}

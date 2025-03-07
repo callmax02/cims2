@@ -2,7 +2,7 @@ package com.example.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-// import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -17,8 +17,8 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Department is required")
-    private String department;
+    @NotNull(message = "Assigning Department is required")
+    private Department assigningDepartment;
 
     @NotBlank(message = "Asset Tag is required")
     @Column(unique = true)

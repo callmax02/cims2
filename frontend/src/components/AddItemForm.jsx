@@ -5,7 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AddItemForm = () => {
   const [formData, setFormData] = useState({
-    department: "",
+    assigningDepartment: "",
     assetTag: "",
     serial: "",
     model: "",
@@ -100,21 +100,26 @@ const AddItemForm = () => {
       >
         <h2 className="text-xl font-semibold mb-4 text-center">Add New Item</h2>
 
+        {/* Replace the department input with a select dropdown */}
         <div className="mb-4">
           <label className="block text-sm font-medium">
-            <span className="text-red-500">*</span> Department
+            <span className="text-red-500">*</span> Assigning Department
           </label>
-          <input
-            type="text"
-            name="department"
-            value={formData.department}
+          <select
+            name="assigningDepartment"
+            value={formData.assigningDepartment}
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
             disabled={isSubmitting}
-          />
+          >
+            <option value="">Select Department</option>
+            <option value="General Services / Facilities">
+              General Services / Facilities
+            </option>
+            <option value="IT">IT</option>
+          </select>
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
@@ -146,7 +151,6 @@ const AddItemForm = () => {
             />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
@@ -178,7 +182,6 @@ const AddItemForm = () => {
             />
           </div>
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-medium">
             <span className="text-red-500">*</span> Default Location
@@ -193,7 +196,6 @@ const AddItemForm = () => {
             disabled={isSubmitting}
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-medium">Image</label>
           <input
@@ -211,7 +213,6 @@ const AddItemForm = () => {
             />
           )}
         </div>
-
         <div className="flex justify-between">
           <button
             type="submit"

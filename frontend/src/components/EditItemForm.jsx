@@ -8,7 +8,7 @@ const EditItemForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    department: "",
+    assigningDepartment: "",
     assetTag: "",
     serial: "",
     model: "",
@@ -48,7 +48,7 @@ const EditItemForm = () => {
         const data = await response.json();
 
         setFormData({
-          department: data.department || "",
+          assigningDepartment: data.assigningDepartment || "",
           assetTag: data.assetTag || "",
           serial: data.serial || "",
           model: data.model || "",
@@ -149,21 +149,28 @@ const EditItemForm = () => {
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg"
         encType="multipart/form-data"
       >
-        <h2 className="text-xl font-semibold mb-4 text-center">Edit Item</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center"> Edit Item</h2>
 
+        {/* // Replace the department input with a select dropdown */}
         <div className="mb-4">
-          <label className="block text-sm font-medium">Department</label>
-          <input
-            type="text"
-            name="department"
-            value={formData.department}
+          <label className="block text-sm font-medium">
+            Assigning Department
+          </label>
+          <select
+            name="assigningDepartment"
+            value={formData.assigningDepartment}
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
             disabled={isDisabled}
-          />
+          >
+            <option value="">Select Department</option>
+            <option value="General Services / Facilities">
+              General Services / Facilities
+            </option>
+            <option value="IT">IT</option>
+          </select>
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">Asset Tag</label>
@@ -192,7 +199,6 @@ const EditItemForm = () => {
             />
           </div>
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">Model</label>
@@ -220,7 +226,6 @@ const EditItemForm = () => {
             />
           </div>
         </div>
-
         <div className="mb-4">
           <label className="block text-sm font-medium">Default Location</label>
           <input
@@ -233,7 +238,6 @@ const EditItemForm = () => {
             disabled={isDisabled}
           />
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">Image</label>
