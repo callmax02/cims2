@@ -66,7 +66,6 @@ public class ItemServiceImpl implements ItemService{
             existingItem.setModel(itemDetails.getModel());
             existingItem.setStatus(itemDetails.getStatus());
             existingItem.setDefaultLocation(itemDetails.getDefaultLocation());
-            existingItem.setImage(itemDetails.getImage());
 
             // Regenerate QR based on new asset tag
             byte[] qrCode = generateQRCode(existingItem.getAssetTag().toString());

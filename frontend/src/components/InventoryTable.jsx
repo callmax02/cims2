@@ -50,7 +50,6 @@ const InventoryTable = () => {
         // Convert Base64 strings to proper image URLs
         const itemsWithImages = data.map((item) => ({
           ...item,
-          imageUrl: item.image ? `data:image/jpeg;base64,${item.image}` : null,
           qrCode: item.qrCode && `data:image/jpeg;base64,${item.qrCode}`,
         }));
 
@@ -246,7 +245,6 @@ const InventoryTable = () => {
                 <th className="border border-gray-300 p-2">Model</th>
                 <th className="border border-gray-300 p-2">Status</th>
                 <th className="border border-gray-300 p-2">Default Location</th>
-                <th className="border border-gray-300 p-2">Image</th>
                 <th className="border border-gray-300 p-2">Actions</th>
               </tr>
             </thead>
@@ -270,17 +268,6 @@ const InventoryTable = () => {
                     </td>
                     <td className="border border-gray-300 p-2">
                       {item.defaultLocation}
-                    </td>
-                    <td className="border border-gray-300 p-2">
-                      <img
-                        src={
-                          item.imageUrl
-                            ? item.imageUrl
-                            : "https://placehold.co/40x40"
-                        }
-                        alt="Asset"
-                        className="w-10 h-10 rounded-md"
-                      />
                     </td>
                     <td className="border border-gray-300 p-2">
                       <div className="flex justify-center space-x-1">
@@ -329,7 +316,7 @@ const InventoryTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center p-4">
+                  <td colSpan="8" className="text-center p-4">
                     No items found.
                   </td>
                 </tr>

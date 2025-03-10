@@ -38,8 +38,5 @@ public class Item {
     private String defaultLocation;
 
     @Lob
-    private byte[] image;
-
-    @Lob
     private byte[] qrCode;
 }

@@ -11,10 +11,8 @@ const AddItemForm = () => {
     model: "",
     status: "",
     defaultLocation: "",
-    image: "", // Stores Base64-encoded image
   });
 
-  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const navigate = useNavigate();
@@ -22,26 +20,6 @@ const AddItemForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = reader.result.split(",")[1]; // Remove prefix
-        setFormData((prev) => ({ ...prev, image: base64String }));
-        setImagePreview(reader.result); // Keep full Base64 for preview
-      };
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        navigate(location.pathname, {
-          replace: true,
-          state: { message: "Failed to load image", type: "error" },
-        });
-      };
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -195,23 +173,6 @@ const AddItemForm = () => {
             required
             disabled={isSubmitting}
           />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full border rounded p-2"
-            disabled={isSubmitting}
-          />
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mt-2 w-20 h-20 rounded shadow"
-            />
-          )}
         </div>
         <div className="flex justify-between">
           <button

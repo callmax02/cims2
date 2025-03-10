@@ -14,14 +14,10 @@ const EditItemForm = () => {
     model: "",
     status: "",
     defaultLocation: "",
-    image: null,
     qrCode: null,
   });
 
   const [isDisabled, setIsDisabled] = useState(true);
-  const [imagePreview, setImagePreview] = useState(
-    "https://placehold.co/40x40"
-  );
   const [qrPreview, setQrPreview] = useState("https://placehold.co/40x40");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [qrFromAssetTagTextBox, setQrFromAssetTagTextBox] = useState("");
@@ -54,15 +50,10 @@ const EditItemForm = () => {
           model: data.model || "",
           status: data.status || "",
           defaultLocation: data.defaultLocation || "",
-          image: data.image || "",
           qrCode: data.qrCode || "",
         });
 
         setIsDisabled(false);
-
-        if (data.image) {
-          setImagePreview(`data:image/jpeg;base64,${data.image}`);
-        }
 
         if (data.qrCode) {
           setQrPreview(`data:image/jpeg;base64,${data.qrCode}`);
@@ -84,26 +75,6 @@ const EditItemForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = reader.result.split(",")[1]; // Remove prefix
-        setFormData((prev) => ({ ...prev, image: base64String }));
-        setImagePreview(reader.result); // Keep full Base64 for preview
-      };
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        navigate(location.pathname, {
-          replace: true,
-          state: { message: "Failed to load image", type: "error" },
-        });
-      };
-    }
   };
 
   // Handle form submission (PUT request)
@@ -238,42 +209,21 @@ const EditItemForm = () => {
             disabled={isDisabled}
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full border rounded p-2"
-              disabled={isDisabled}
-            />
-            {imagePreview && (
-              <div className="flex justify-center mt-4">
-                <img
-                  src={imagePreview}
-                  alt="Image Preview"
-                  className="w-24 h-24 rounded shadow"
-                />
-              </div>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">QR Code</label>
-            {qrFromAssetTagTextBox ? (
-              <div className="flex justify-center mt-5">
-                <QRCodeCanvas value={qrFromAssetTagTextBox} size={120} />
-              </div>
-            ) : (
-              <div className="flex justify-center mt-5">
-                <img
-                  src={qrPreview}
-                  alt="QR Code Preview"
-                  className="w-40 h-40 rounded shadow object-cover"
-                />
-              </div>
-            )}
-          </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">QR Code</label>
+          {qrFromAssetTagTextBox ? (
+            <div className="flex justify-center mt-5">
+              <QRCodeCanvas value={qrFromAssetTagTextBox} size={120} />
+            </div>
+          ) : (
+            <div className="flex justify-center mt-5">
+              <img
+                src={qrPreview}
+                alt="QR Code Preview"
+                className="w-40 h-40 rounded shadow object-cover"
+              />
+            </div>
+          )}
         </div>
         <div className="flex justify-between">
           <button
