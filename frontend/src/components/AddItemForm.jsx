@@ -6,6 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const AddItemForm = () => {
   const [formData, setFormData] = useState({
     assigningDepartment: "",
+    type: "",
     assetTag: "",
     serial: "",
     model: "",
@@ -96,6 +97,27 @@ const AddItemForm = () => {
               General Services / Facilities
             </option>
             <option value="IT">IT</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">
+            <span className="text-red-500">*</span> Type
+          </label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+            disabled={isSubmitting}
+          >
+            <option value="">Select Type</option>
+            <option value="Computers / Peripherals">
+              Computers / Peripherals
+            </option>
+            <option value="Furnitures & Fixtures">Furnitures & Fixtures</option>
+            <option value="Cabinets / Enclosures">Cabinets / Enclosures</option>
+            <option value="Electronic Appliances">Electronic Appliances</option>
           </select>
         </div>
         <div className="grid grid-cols-2 gap-4">

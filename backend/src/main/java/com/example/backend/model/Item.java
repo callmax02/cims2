@@ -17,6 +17,9 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Type is required")
+    private Type type;
+
     @NotNull(message = "Assigning Department is required")
     private Department assigningDepartment;
 

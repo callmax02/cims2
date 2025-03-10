@@ -241,6 +241,7 @@ const InventoryTable = () => {
                   Assigning Department
                 </th>
                 <th className="border border-gray-300 p-2">Asset Tag</th>
+                <th className="border border-gray-300 p-2">Type</th>
                 <th className="border border-gray-300 p-2">Serial</th>
                 <th className="border border-gray-300 p-2">Model</th>
                 <th className="border border-gray-300 p-2">Status</th>
@@ -259,6 +260,7 @@ const InventoryTable = () => {
                     <td className="border border-gray-300 p-2">
                       {item.assetTag}
                     </td>
+                    <td className="border border-gray-300 p-2">{item.type}</td>
                     <td className="border border-gray-300 p-2">
                       {item.serial}
                     </td>
@@ -316,7 +318,7 @@ const InventoryTable = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center p-4">
+                  <td colSpan="9" className="text-center p-4">
                     No items found.
                   </td>
                 </tr>
