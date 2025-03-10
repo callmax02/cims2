@@ -14,6 +14,10 @@ public enum Type {
         this.displayName = displayName;
     }
 
+    public String getCode() {
+        return name(); // Returns "CO", "FU", etc.
+    }
+
     @JsonValue
     public String getDisplayName() {
         return displayName;

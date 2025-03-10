@@ -1,10 +1,13 @@
 package com.example.backend.service;
 
 import java.io.ByteArrayOutputStream;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.exception.DuplicateAssetTagException;
 import com.example.backend.exception.FailedToGenerateQRException;
@@ -19,7 +22,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @Service
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
 
     private ItemRepository itemRepository;
 
@@ -32,49 +35,62 @@ public class ItemServiceImpl implements ItemService{
         return item;
     }
 
+    @Transactional
     public Item createItem(Item item) {
+        // Save item to generate ID (part of the transaction)
+        Item savedItem = itemRepository.save(item);
 
-        // Check for duplicate asset tags using findByAssetTag
-        itemRepository.findByAssetTag(item.getAssetTag()).ifPresent(existingItem -> {
-            throw new DuplicateAssetTagException(item.getAssetTag());
-        });
+        // Generate YYMM from current date
+        YearMonth currentYearMonth = YearMonth.now(ZoneId.of("UTC"));
+        String yyMM = String.format("%02d%02d",
+                currentYearMonth.getYear() % 100,
+                currentYearMonth.getMonthValue());
 
-        // Generate QR code using the assigned ID
-        byte[] qrCode = generateQRCode(item.getAssetTag().toString());
+        // Generate assetTag
+        String assetTag = generateAssetTag(savedItem, yyMM);
 
-        // Save the item with the generated QR code
-        item.setQrCode(qrCode);
-        return itemRepository.save(item);
+        // Check for duplicates
+        if (itemRepository.findByAssetTag(assetTag).isPresent()) {
+            throw new DuplicateAssetTagException(assetTag); // Triggers rollback
+        }
+
+        // Update managed entity
+        savedItem.setAssetTag(assetTag);
+        savedItem.setQrCode(generateQRCode(assetTag));
+
+        return savedItem;
     }
 
 
+    @Transactional
     public Item updateItem(Long id, Item itemDetails) {
         return itemRepository.findById(id).map(existingItem -> {
-            // Check if the asset tag is changed
-            if (!existingItem.getAssetTag().equals(itemDetails.getAssetTag())) {
-                // Check if another record (not this one) already has the new assetTag
-                Optional<Item> itemWithSameTag = itemRepository.findByAssetTag(itemDetails.getAssetTag());
-                if (itemWithSameTag.isPresent() && !itemWithSameTag.get().getId().equals(id)) {
-                    throw new DuplicateAssetTagException(itemDetails.getAssetTag());
-                }
+            // Extract YYMM from existing assetTag
+            String existingAssetTag = existingItem.getAssetTag();
+            if (existingAssetTag == null || existingAssetTag.split("-").length < 5) {
+                throw new IllegalArgumentException("Invalid assetTag format");
             }
-    
-            // Update fields
+            String yyMM = existingAssetTag.split("-")[2];
+
+            // Update fields that affect the assetTag
             existingItem.setAssigningDepartment(itemDetails.getAssigningDepartment());
-            existingItem.setAssetTag(itemDetails.getAssetTag());
-            existingItem.setSerial(itemDetails.getSerial());
-            existingItem.setModel(itemDetails.getModel());
-            existingItem.setStatus(itemDetails.getStatus());
-            existingItem.setDefaultLocation(itemDetails.getDefaultLocation());
             existingItem.setType(itemDetails.getType());
+            existingItem.setSubType(itemDetails.getSubType());
 
-            // Regenerate QR based on new asset tag
-            byte[] qrCode = generateQRCode(existingItem.getAssetTag().toString());
+            // Generate new assetTag using existing YYMM
+            String newAssetTag = generateAssetTag(existingItem, yyMM);
 
-            // Update the saved item with the generated QR code
-            existingItem.setQrCode(qrCode);
-    
-            return itemRepository.save(existingItem);
+            // Check for duplicates (excluding current item)
+            Optional<Item> duplicateItem = itemRepository.findByAssetTag(newAssetTag);
+            if (duplicateItem.isPresent() && !duplicateItem.get().getId().equals(id)) {
+                throw new DuplicateAssetTagException(newAssetTag); // Triggers rollback
+            }
+
+            // Update assetTag and QR code
+            existingItem.setAssetTag(newAssetTag);
+            existingItem.setQrCode(generateQRCode(newAssetTag));
+
+            return existingItem;
         }).orElseThrow(() -> new ItemNotFoundException(id));
     }
     
@@ -85,6 +101,17 @@ public class ItemServiceImpl implements ItemService{
         }
         itemRepository.deleteById(id);
     }
+
+    // Helper method to generate assetTag
+    private String generateAssetTag(Item item, String yyMM) {
+        String assigningDeptCode = item.getAssigningDepartment().getCode();
+        String typeCode = item.getType().getCode();
+        String subTypeUpper = item.getSubType().toUpperCase();
+        String paddedId = String.format("%04d", item.getId());
+        return String.format("CMX-%s-%s-%s-%s-%s",
+                assigningDeptCode, yyMM, typeCode, subTypeUpper, paddedId);
+    }
+
 
     // QR Code Generation Method
     private byte[] generateQRCode(String text) {

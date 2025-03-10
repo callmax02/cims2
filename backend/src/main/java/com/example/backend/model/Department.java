@@ -12,6 +12,10 @@ public enum Department {
         this.displayName = displayName;
     }
 
+    public String getCode() {
+        return name(); // Returns "GS" or "IT"
+    }
+
     @JsonValue
     public String getDisplayName() {
         return displayName;

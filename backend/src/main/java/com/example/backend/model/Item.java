@@ -17,18 +17,18 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Type is required")
-    private Type type;
-
     @NotNull(message = "Assigning Department is required")
     private Department assigningDepartment;
 
-    @NotBlank(message = "Asset Tag is required")
     @Column(unique = true)
     private String assetTag;
 
-    @NotBlank(message = "Serial is required")
-    // @Column(unique = true)
+    @NotNull(message = "Type is required")
+    private Type type;
+
+    @NotBlank(message = "SubType is required")
+    private String subType;
+
     private String serial;
 
     @NotBlank(message = "Model is required")
