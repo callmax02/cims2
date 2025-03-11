@@ -77,6 +77,12 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setType(itemDetails.getType());
             existingItem.setSubType(itemDetails.getSubType());
 
+            // Update other fields
+            existingItem.setSerial(itemDetails.getSerial());
+            existingItem.setModel(itemDetails.getModel());
+            existingItem.setStatus(itemDetails.getStatus());
+            existingItem.setDefaultLocation(itemDetails.getDefaultLocation());
+
             // Generate new assetTag using existing YYMM
             String newAssetTag = generateAssetTag(existingItem, yyMM);
 

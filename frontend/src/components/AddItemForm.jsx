@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -7,6 +7,7 @@ const AddItemForm = () => {
   const [formData, setFormData] = useState({
     assigningDepartment: "",
     type: "",
+    subType: "",
     assetTag: "",
     serial: "",
     model: "",
@@ -79,7 +80,6 @@ const AddItemForm = () => {
       >
         <h2 className="text-xl font-semibold mb-4 text-center">Add New Item</h2>
 
-        {/* Replace the department input with a select dropdown */}
         <div className="mb-4">
           <label className="block text-sm font-medium">
             <span className="text-red-500">*</span> Assigning Department
@@ -120,38 +120,32 @@ const AddItemForm = () => {
             <option value="Electronic Appliances">Electronic Appliances</option>
           </select>
         </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">
+            <span className="text-red-500">*</span> Subtype
+          </label>
+          <input
+            type="text"
+            name="subType"
+            value={formData.subType}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+            disabled={isSubmitting}
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
-            <label className="block text-sm font-medium">
-              <span className="text-red-500">*</span> Asset Tag
-            </label>
-            <input
-              type="text"
-              name="assetTag"
-              value={formData.assetTag}
-              onChange={handleChange}
-              className="w-full border rounded p-2"
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium">
-              <span className="text-red-500">*</span> Serial
-            </label>
+            <label className="block text-sm font-medium">Serial</label>
             <input
               type="text"
               name="serial"
               value={formData.serial}
               onChange={handleChange}
               className="w-full border rounded p-2"
-              required
               disabled={isSubmitting}
             />
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
               <span className="text-red-500">*</span> Model
@@ -166,7 +160,8 @@ const AddItemForm = () => {
               disabled={isSubmitting}
             />
           </div>
-
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
               <span className="text-red-500">*</span> Status
@@ -181,20 +176,20 @@ const AddItemForm = () => {
               disabled={isSubmitting}
             />
           </div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">
-            <span className="text-red-500">*</span> Default Location
-          </label>
-          <input
-            type="text"
-            name="defaultLocation"
-            value={formData.defaultLocation}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-            disabled={isSubmitting}
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Default Location
+            </label>
+            <input
+              type="text"
+              name="defaultLocation"
+              value={formData.defaultLocation}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
+              required
+              disabled={isSubmitting}
+            />
+          </div>
         </div>
         <div className="flex justify-between">
           <button

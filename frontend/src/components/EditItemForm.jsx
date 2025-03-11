@@ -10,7 +10,7 @@ const EditItemForm = () => {
   const [formData, setFormData] = useState({
     assigningDepartment: "",
     type: "",
-    assetTag: "",
+    subType: "",
     serial: "",
     model: "",
     status: "",
@@ -20,11 +20,37 @@ const EditItemForm = () => {
 
   const [isDisabled, setIsDisabled] = useState(true);
   const [qrPreview, setQrPreview] = useState("https://placehold.co/40x40");
+  const [qrCodeText, setQrCodeText] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [qrFromAssetTagTextBox, setQrFromAssetTagTextBox] = useState("");
 
-  const handleAssetTagTextboxBlur = () => {
-    setQrFromAssetTagTextBox(formData.assetTag);
+  const generateAssetTag = (assigningDepartment, type, subType, itemId) => {
+    const departmentCodes = {
+      "General Services / Facilities": "GS",
+      IT: "IT",
+    };
+    const typeCodes = {
+      "Computers / Peripherals": "CO",
+      "Furnitures & Fixtures": "FU",
+      "Cabinets / Enclosures": "CA",
+      "Electronic Appliances": "EL",
+    };
+
+    const departmentCode = assigningDepartment
+      ? departmentCodes[assigningDepartment] || "<Assigning Department Code>"
+      : "<Assigning Department Code>";
+
+    const typeCode = type ? typeCodes[type] || "<Type Code>" : "<Type Code>";
+
+    const subTypePart = subType ? subType.toUpperCase() : "<SubType>";
+
+    const currentDate = new Date();
+    const yy = currentDate.getFullYear().toString().slice(-2);
+    const mm = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const datePart = yy + mm;
+
+    const itemIdPart = String(itemId).padStart(4, "0");
+
+    return `CMX-${departmentCode}-${datePart}-${typeCode}-${subTypePart}-${itemIdPart}`;
   };
 
   // Fetch item details
@@ -47,13 +73,15 @@ const EditItemForm = () => {
         setFormData({
           assigningDepartment: data.assigningDepartment || "",
           type: data.type || "",
-          assetTag: data.assetTag || "",
+          subType: data.subType || "",
           serial: data.serial || "",
           model: data.model || "",
           status: data.status || "",
           defaultLocation: data.defaultLocation || "",
           qrCode: data.qrCode || "",
         });
+
+        setQrCodeText(data.assetTag);
 
         setIsDisabled(false);
 
@@ -72,6 +100,17 @@ const EditItemForm = () => {
 
     fetchItem();
   }, [id]);
+
+  // Set QR code & text
+  useEffect(() => {
+    const newAssetTag = generateAssetTag(
+      formData.assigningDepartment,
+      formData.type,
+      formData.subType,
+      id
+    );
+    setQrCodeText(newAssetTag);
+  }, [formData.assigningDepartment, formData.type, formData.subType, id]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -124,6 +163,17 @@ const EditItemForm = () => {
       >
         <h2 className="text-xl font-semibold mb-4 text-center"> Edit Item</h2>
 
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Asset Tag</label>
+          <input
+            type="text"
+            name="assetTag"
+            value={qrCodeText}
+            className="w-full border rounded p-2"
+            disabled
+          />
+        </div>
+
         {/* // Replace the department input with a select dropdown */}
         <div className="mb-4">
           <label className="block text-sm font-medium">
@@ -150,7 +200,7 @@ const EditItemForm = () => {
           </label>
           <select
             name="type"
-            value={formData.type || ""}
+            value={formData.type}
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
@@ -165,23 +215,21 @@ const EditItemForm = () => {
             <option value="Electronic Appliances">Electronic Appliances</option>
           </select>
         </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium">
+            <span className="text-red-500">*</span> Subtype
+          </label>
+          <input
+            type="text"
+            name="subType"
+            value={formData.subType}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+            disabled={isDisabled}
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium">
-              <span className="text-red-500">*</span> Asset Tag
-            </label>
-            <input
-              type="text"
-              name="assetTag"
-              value={formData.assetTag}
-              onChange={handleChange}
-              onBlur={handleAssetTagTextboxBlur}
-              className="w-full border rounded p-2"
-              required
-              disabled={isDisabled}
-            />
-          </div>
-
           <div className="mb-4">
             <label className="block text-sm font-medium">Serial</label>
             <input
@@ -190,12 +238,9 @@ const EditItemForm = () => {
               value={formData.serial}
               onChange={handleChange}
               className="w-full border rounded p-2"
-              required
               disabled={isDisabled}
             />
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
               <span className="text-red-500">*</span> Model
@@ -210,7 +255,8 @@ const EditItemForm = () => {
               disabled={isDisabled}
             />
           </div>
-
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
             <label className="block text-sm font-medium">
               <span className="text-red-500">*</span> Status
@@ -225,26 +271,26 @@ const EditItemForm = () => {
               disabled={isDisabled}
             />
           </div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">
-            <span className="text-red-500">*</span> Default Location
-          </label>
-          <input
-            type="text"
-            name="defaultLocation"
-            value={formData.defaultLocation}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-            disabled={isDisabled}
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium">
+              <span className="text-red-500">*</span> Default Location
+            </label>
+            <input
+              type="text"
+              name="defaultLocation"
+              value={formData.defaultLocation}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
+              required
+              disabled={isDisabled}
+            />
+          </div>
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium">QR Code</label>
-          {qrFromAssetTagTextBox ? (
+          {qrCodeText ? (
             <div className="flex justify-center mt-5">
-              <QRCodeCanvas value={qrFromAssetTagTextBox} size={120} />
+              <QRCodeCanvas value={qrCodeText} size={120} />
             </div>
           ) : (
             <div className="flex justify-center mt-5">
